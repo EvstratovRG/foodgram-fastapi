@@ -1,7 +1,13 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+import pathlib
+
+APP_PATH = pathlib.Path(__file__).parent.parent
 
 
 class Settings(BaseSettings):
+
+    model_config = SettingsConfigDict(env_file=APP_PATH / '.env')
+
     DB_HOST: str
     DB_USER: str
     DB_PORT: int
@@ -25,8 +31,6 @@ class Settings(BaseSettings):
                 f'{self.DB_HOST}:'
                 f'{self.DB_PORT}/'
                 f'{self.DB_NAME}')
-
-    model_config = SettingsConfigDict(env_file='.env')
 
 
 settings = Settings()

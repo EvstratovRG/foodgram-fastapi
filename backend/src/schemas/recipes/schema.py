@@ -1,17 +1,8 @@
 from pydantic import BaseModel, StringConstraints
 from typing import Annotated
 
-from backend.schemas.base import BaseORMSchema
-
-
-class UserBaseSchema(BaseModel):
-    id: int
-    username: Annotated(str, StringConstraints(max_length=150))
-    first_name: Annotated(str, StringConstraints(max_length=150))
-    last_name: Annotated(str, StringConstraints(max_length=150))
-    email: Annotated(str, StringConstraints(max_length=150))
-    is_staff: bool
-    is_active: bool
+from backend.src.schemas.users.schema import UserBaseSchema
+from backend.src.schemas.base import BaseORMSchema
 
 
 class RecipeIngredientSchema(BaseModel):

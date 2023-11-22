@@ -1,34 +1,17 @@
 from sqlalchemy import (
     Integer,
     String,
-    UniqueConstraint,
     ForeignKey,
     Text,
 )
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy_file import ImageField
-from backend.models.base import Base, TimeMixin
+from backend.src.models.base import Base, TimeMixin, str_200
 from typing import Annotated
-from base import str_150, str_200
+from backend.src.models.users.models import User
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
-
-
-class User(TimeMixin, Base):
-    __tablename__: str = "users"
-    __table_args__ = (
-        UniqueConstraint("username"),
-    )
-
-    id: Mapped[intpk] = mapped_column(autoincrement=True)
-    username: Mapped[str_150] = mapped_column(unique=True)
-    first_name: Mapped[str_150 | None]
-    last_name: Mapped[str_150 | None]
-    email: Mapped[str_150]
-    is_staff: Mapped[bool] = mapped_column(default=False)
-    is_active: Mapped[bool] = mapped_column(default=True)
-    recipes: Mapped[list['Recipe']] = relationship(uselist=True)
 
 
 class RecipeIngredient(TimeMixin, Base):
@@ -103,7 +86,7 @@ class Recipe(TimeMixin, Base):
             ondelete='CASCADE'
         ),
     )
-    author: Mapped["User"] = relationship(
+    author: Mapped['User'] = relationship(
         'User',
         back_populates='recipes',
     )
@@ -129,14 +112,14 @@ class Follow(TimeMixin, Base):
             ondelete="CASCADE"
         ),
     )
-    user: Mapped[User] = relationship('User')
+    user: Mapped['User'] = relationship('User')
     following_id: Mapped[int] = mapped_column(
         ForeignKey(
             'users.id',
             ondelete="CASCADE"
         ),
     )
-    following: Mapped[User] = relationship('User')
+    following: Mapped['User'] = relationship('User')
 
 
 class PurchaseCart(TimeMixin, Base):
