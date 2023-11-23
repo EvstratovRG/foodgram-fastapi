@@ -3,19 +3,25 @@ from sqlalchemy import (
     String,
     ForeignKey,
     Text,
+    UniqueConstraint
 )
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy_file import ImageField
-from backend.src.models.base import Base, TimeMixin, str_200
-from typing import Annotated
-from backend.src.models.users.models import User
+from src.models.base import Base, TimeMixin, str_200
+from typing import Annotated, TYPE_CHECKING
+from sqlalchemy.sql.sqltypes import JSON
+from sqlalchemy.orm import validates
+from sqlalchemy.exc import IntegrityError
+
+if TYPE_CHECKING:
+    from src.models.users.models import User
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
 
 
 class RecipeIngredient(TimeMixin, Base):
-    __tablename__: str = 'recipes_ingredients'
+    __tablename__ = 'recipes_ingredients'
 
     recipe_id: Mapped[int] = mapped_column(
         ForeignKey('recipes.id'),
@@ -29,7 +35,7 @@ class RecipeIngredient(TimeMixin, Base):
 
 
 class RecipeTag(TimeMixin, Base):
-    __tablename__: str = 'recipes_tags'
+    __tablename__ = 'recipes_tags'
 
     recipe_id: Mapped[int] = mapped_column(
         ForeignKey('recipes.id'),
@@ -42,7 +48,7 @@ class RecipeTag(TimeMixin, Base):
 
 
 class Ingredient(TimeMixin, Base):
-    __tablename__: str = "ingredients"
+    __tablename__ = "ingredients"
 
     id: Mapped[intpk] = mapped_column(autoincrement=True)
     name: Mapped[str_200]
@@ -55,7 +61,7 @@ class Ingredient(TimeMixin, Base):
 
 
 class Tag(TimeMixin, Base):
-    __tablename__: str = "tags"
+    __tablename__ = "tags"
 
     id: Mapped[intpk] = mapped_column(autoincrement=True)
     name: Mapped[str_200]
@@ -69,13 +75,13 @@ class Tag(TimeMixin, Base):
 
 
 class Recipe(TimeMixin, Base):
-    __tablename__: str = "recipes"
+    __tablename__ = "recipes"
 
     id: Mapped[intpk] = mapped_column(autoincrement=True, index=True)
     name: Mapped[str] = mapped_column(String(50), index=True)
     text: Mapped[str | None] = mapped_column(Text, default=None)
     cooking_time: Mapped[int] = mapped_column(Integer, default=1)
-    image: Mapped[str | None] = mapped_column(
+    image: Mapped[JSON | None] = mapped_column(
         ImageField(
             upload_storage='/backend/media'
         ),
@@ -104,57 +110,111 @@ class Recipe(TimeMixin, Base):
 
 
 class Follow(TimeMixin, Base):
-    __tablename__: str = "followers"
+    __tablename__ = "follows"
+    __table_args__ = (
+        UniqueConstraint(
+            'user_id',
+            'following_id',
+            name='unique_following_user_following'
+        ),
+    )
 
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(
         ForeignKey(
             'users.id',
-            ondelete="CASCADE"
+            ondelete="CASCADE",
         ),
     )
-    user: Mapped['User'] = relationship('User')
+    user: Mapped['User'] = relationship(
+        'User',
+        foreign_keys=[user_id],
+        back_populates='followers',
+        lazy='joined',
+    )
     following_id: Mapped[int] = mapped_column(
         ForeignKey(
             'users.id',
             ondelete="CASCADE"
         ),
     )
-    following: Mapped['User'] = relationship('User')
+    following: Mapped['User'] = relationship(
+        'User',
+        foreign_keys=[following_id],
+        back_populates='following',
+        lazy='joined',
+    )
+
+    @validates('following')
+    def validate_following(self, key, following):
+        if following == self.user:
+            raise IntegrityError('Нельзя подписываться на самого себя')
+        return following
 
 
 class PurchaseCart(TimeMixin, Base):
-    __tablename__: str = "purchase_carts"
-
+    __tablename__ = "purchase_carts"
+    __table_args__ = (
+        UniqueConstraint(
+            'user_id',
+            'recipes_id',
+            name='unique_recipe_carts_user_carts'
+        ),
+    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(
         ForeignKey(
             "users.id",
             ondelete="CASCADE"
         ),
     )
-    user: Mapped['User'] = relationship('User')
+    user: Mapped['User'] = relationship(
+        'User',
+        foreign_keys=[user_id],
+        back_populates='user_carts',
+    )
     recipes_id: Mapped[int] = mapped_column(
         ForeignKey(
             "recipes.id",
             ondelete="CASCADE"
         ),
     )
-    recipe: Mapped['Recipe'] = relationship('Recipe')
+    recipe: Mapped['Recipe'] = relationship(
+        'Recipe',
+        foreign_keys=[recipes_id],
+        back_populates='recipe_carts',
+    )
 
 
 class Favorite(TimeMixin, Base):
-    __tablename__: str = "favorites"
-
+    __tablename__ = "favorites"
+    __table_args__ = (
+        UniqueConstraint(
+            'user_id',
+            'recipes_id',
+            name='unique_recipe_favorites_user_favorites'
+        ),
+    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(
         ForeignKey(
             "users.id",
             ondelete="CASCADE"
         ),
     )
-    user: Mapped['User'] = relationship('User')
+    user: Mapped['User'] = relationship(
+        'User',
+        foreign_keys=[user_id],
+        back_populates='user_favorites',
+    )
     recipes_id: Mapped[int] = mapped_column(
         ForeignKey(
             "recipes.id",
             ondelete="CASCADE"
         ),
     )
-    recipe: Mapped['Recipe'] = relationship('Recipe')
+    recipe: Mapped['Recipe'] = relationship(
+        'Recipe',
+        foreign_keys=[recipes_id],
+        back_populates='recipe_favorites',
+    )

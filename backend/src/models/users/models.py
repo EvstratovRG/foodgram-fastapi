@@ -1,16 +1,18 @@
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from backend.src.models.base import Base, TimeMixin
-from typing import Annotated
-from backend.src.models.base import str_150
-from backend.src.models.recipes.models import Recipe
+from src.models.base import Base, TimeMixin
+from typing import Annotated, TYPE_CHECKING
+from src.models.base import str_150
+
+if TYPE_CHECKING:
+    from src.models.recipes.models import Recipe
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
 
 
 class User(TimeMixin, Base):
-    __tablename__: str = "users"
+    __tablename__ = "users"
     __table_args__ = (
         UniqueConstraint("username"),
     )
