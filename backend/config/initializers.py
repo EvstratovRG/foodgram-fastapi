@@ -12,4 +12,4 @@ def init_routers(application: FastAPI) -> None:
     from config.routers import get_routers
 
     for router in get_routers():
-        application.include_router(router)
+        application.include_router(router, prefix='/api')

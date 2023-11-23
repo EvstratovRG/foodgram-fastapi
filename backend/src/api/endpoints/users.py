@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, status
 from typing import Any
 
-from src.queries.users import users as user_queries
-from src.schemas.users import schema as user_schemas
+from src.queries import users as user_queries
+from src.schemas import users as user_schemas
 from src.schemas import base as base_schemas
 from config.db import get_async_session, AsyncSession
 

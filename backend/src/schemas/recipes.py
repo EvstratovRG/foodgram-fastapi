@@ -1,12 +1,12 @@
 from pydantic import BaseModel, StringConstraints
 from typing import Annotated
 
-from backend.src.schemas.users.schema import UserBaseSchema
-from backend.src.schemas.base import BaseORMSchema
+from src.schemas.users import UserBaseSchema
+from src.schemas.base import BaseORMSchema
 
 
-str_200 = Annotated(str, StringConstraints(max_length=200))
-str_50 = Annotated(str, StringConstraints(max_length=50))
+str_200 = Annotated[str, StringConstraints(max_length=200)]
+str_50 = Annotated[str, StringConstraints(max_length=50)]
 
 
 class RecipeIngredientSchema(BaseModel):
