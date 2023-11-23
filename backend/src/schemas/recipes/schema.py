@@ -5,6 +5,10 @@ from backend.src.schemas.users.schema import UserBaseSchema
 from backend.src.schemas.base import BaseORMSchema
 
 
+str_200 = Annotated(str, StringConstraints(max_length=200))
+str_50 = Annotated(str, StringConstraints(max_length=50))
+
+
 class RecipeIngredientSchema(BaseModel):
     recipe_id: int
     ingredient_id: int
@@ -18,19 +22,19 @@ class RecipeTagSchema(BaseModel):
 
 class BaseIngredientSchema(BaseModel):
     id: int
-    name: Annotated(str, StringConstraints(max_length=200))
+    name: str_200
     measurement_unit: int
 
 
 class BaseTagSchema(BaseModel):
     id: int
-    name: Annotated(str, StringConstraints(max_length=200))
-    slug: Annotated(str, StringConstraints(max_length=200))
+    name: str_200
+    slug: str_200
     color: str
 
 
 class RecipeBaseSchema(BaseORMSchema):
-    name: Annotated(str, StringConstraints(max_length=50))
+    name: str_50
     text: str
     cooking_time: int
     image: str

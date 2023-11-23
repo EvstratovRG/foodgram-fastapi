@@ -9,14 +9,14 @@ from alembic import context
 
 sys.path.insert(0, (pathlib.Path(__file__).parent.parent / 'src').as_posix())
 
-from src.models import meta
-from config.config import settings
+from src.models import base
+from config import db_config
 from config.db import sync_engine
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-db_url = settings.database_url_psycopg
+db_url = db_config.database_url_psycopg
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
@@ -26,7 +26,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = meta.Base.metadata
+target_metadata = base.Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

@@ -1,12 +1,38 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 import pathlib
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 APP_PATH = pathlib.Path(__file__).parent.parent.parent
 
 
-class Settings(BaseSettings):
+class SiteSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=APP_PATH / 'dotenv' / '.env-site',
+    )
 
-    model_config = SettingsConfigDict(env_file=APP_PATH / '.env')
+    host: str
+    port: int
+    log_level: str
+    reload: bool
+
+
+class ApplicationSettings(BaseSettings):
+
+    model_config = SettingsConfigDict(
+        env_file=APP_PATH / 'dotenv' / '.env-app',
+    )
+
+    title: str
+    description: str
+    debug: bool
+    version: str
+
+
+class DatabaseSettings(BaseSettings):
+
+    model_config = SettingsConfigDict(
+        env_file=APP_PATH / 'dotenv' / '.env',
+    )
 
     POSTGRES_HOST: str
     POSTGRES_USER: str
@@ -31,6 +57,3 @@ class Settings(BaseSettings):
                 f'{self.POSTGRES_HOST}:'
                 f'{self.POSTGRES_PORT}/'
                 f'{self.POSTGRES_DB}')
-
-
-settings = Settings()

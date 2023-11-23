@@ -11,7 +11,7 @@ services:
     image: postgres:13.0
     volumes:
       - foodgram_data:/var/lib/postgresql/data
-    env_file: ../.env
+    env_file: ../dotenv/.env
     ports:
       - "5435:5432"
     restart: always

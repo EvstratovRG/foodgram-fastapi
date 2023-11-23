@@ -1,12 +1,23 @@
 from pydantic import BaseModel, StringConstraints
 from typing import Annotated
 
+str_150 = Annotated[str, StringConstraints(max_length=150)]
+
 
 class UserBaseSchema(BaseModel):
     id: int
-    username: Annotated(str, StringConstraints(max_length=150))
-    first_name: Annotated(str, StringConstraints(max_length=150))
-    last_name: Annotated(str, StringConstraints(max_length=150))
-    email: Annotated(str, StringConstraints(max_length=150))
-    is_staff: bool
-    is_active: bool
+    username: str_150
+    first_name: str_150
+    last_name: str_150
+    email: str_150
+
+
+class CreateUserSchema(BaseModel):
+    username: str_150
+    first_name: str_150
+    last_name: str_150
+    email: str_150
+
+
+class UpdateUserSchema(CreateUserSchema):
+    pass
