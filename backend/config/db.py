@@ -6,15 +6,15 @@ from .config import settings
 
 
 async_engine = create_async_engine(
-    settings.database_url_asyncpg,
+    url=settings.database_url_asyncpg,
     echo=True,
 )
 
 sync_engine = create_engine(
-    settings.database_url_psycopg,
+    url=settings.database_url_psycopg,
     echo=True
 )
-
+# print(settings.database_url_psycopg, '\n\n\n\n\n\n\n\n\n\n')
 AsyncSession = async_sessionmaker(async_engine, expire_on_commit=False)
 SyncSession = sessionmaker(sync_engine)
 

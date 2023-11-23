@@ -1,36 +1,36 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import pathlib
 
-APP_PATH = pathlib.Path(__file__).parent.parent
+APP_PATH = pathlib.Path(__file__).parent.parent.parent
 
 
 class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=APP_PATH / '.env')
 
-    DB_HOST: str
-    DB_USER: str
-    DB_PORT: int
-    DB_NAME: str
-    DB_PASS: str
+    POSTGRES_HOST: str
+    POSTGRES_USER: str
+    POSTGRES_PORT: int
+    POSTGRES_DB: str
+    POSTGRES_PASSWORD: str
 
     @property
     def database_url_asyncpg(self):
         return (f'postgresql+asyncpg://'
-                f'{self.DB_USER}:'
-                f'{self.DB_PASS}@'
-                f'{self.DB_HOST}:'
-                f'{self.DB_PORT}/'
-                f'{self.DB_NAME}')
+                f'{self.POSTGRES_USER}:'
+                f'{self.POSTGRES_PASSWORD}@'
+                f'{self.POSTGRES_HOST}:'
+                f'{self.POSTGRES_PORT}/'
+                f'{self.POSTGRES_DB}')
 
     @property
     def database_url_psycopg(self):
-        return (f'postgresql+psycopg://'
-                f'{self.DB_USER}:'
-                f'{self.DB_PASS}@'
-                f'{self.DB_HOST}:'
-                f'{self.DB_PORT}/'
-                f'{self.DB_NAME}')
+        return (f'postgresql+psycopg2://'
+                f'{self.POSTGRES_USER}:'
+                f'{self.POSTGRES_PASSWORD}@'
+                f'{self.POSTGRES_HOST}:'
+                f'{self.POSTGRES_PORT}/'
+                f'{self.POSTGRES_DB}')
 
 
 settings = Settings()
