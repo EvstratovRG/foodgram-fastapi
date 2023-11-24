@@ -74,6 +74,117 @@ class Tag(TimeMixin, Base):
     )
 
 
+class Follow(TimeMixin, Base):
+    __tablename__ = "follows"
+    __table_args__ = (
+        UniqueConstraint(
+            'follower_id',
+            'following_id',
+            name='unique_follower_to_following'
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    follower_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            'users.id',
+            ondelete="CASCADE",
+        ),
+    )
+    follower: Mapped['User'] = relationship(
+        'User',
+        foreign_keys=[follower_id],
+        back_populates='follower',
+        lazy='joined',
+    )
+    following_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            'users.id',
+            ondelete="CASCADE"
+        ),
+    )
+    following: Mapped['User'] = relationship(
+        'User',
+        foreign_keys=[following_id],
+        back_populates='following',
+        lazy='joined',
+    )
+
+    @validates('following')
+    def validate_following(self, key, following):
+        if following == self.user:
+            raise IntegrityError('Нельзя подписываться на самого себя')
+        return following
+
+
+class PurchaseCart(TimeMixin, Base):
+    __tablename__ = "purchase_carts"
+    __table_args__ = (
+        UniqueConstraint(
+            'user_id',
+            'recipe_id',
+            name='unique_recipe_carts_user_carts'
+        ),
+    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE"
+        ),
+    )
+    buyer: Mapped['User'] = relationship(
+        'User',
+        foreign_keys=[user_id],
+        back_populates='buyer',
+    )
+    recipe_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "recipes.id",
+            ondelete="CASCADE"
+        ),
+    )
+    cart_recipe: Mapped['Recipe'] = relationship(
+        'Recipe',
+        foreign_keys=[recipe_id],
+        back_populates='cart_recipe',
+    )
+
+
+class Favorite(TimeMixin, Base):
+    __tablename__ = "favorites"
+    __table_args__ = (
+        UniqueConstraint(
+            'user_id',
+            'recipe_id',
+            name='unique_recipe_favorites_user_favorites'
+        ),
+    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE"
+        ),
+    )
+    favor_user: Mapped['User'] = relationship(
+        'User',
+        foreign_keys=[user_id],
+        back_populates='favor_user',
+    )
+    recipe_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "recipes.id",
+            ondelete="CASCADE"
+        ),
+    )
+    favor_recipe: Mapped['Recipe'] = relationship(
+        'Recipe',
+        foreign_keys=[recipe_id],
+        back_populates='favor_recipe',
+    )
+
+
 class Recipe(TimeMixin, Base):
     __tablename__ = "recipes"
 
@@ -107,114 +218,15 @@ class Recipe(TimeMixin, Base):
         secondary='recipes_ingredients',
         back_populates='recipes',
     )
-
-
-class Follow(TimeMixin, Base):
-    __tablename__ = "follows"
-    __table_args__ = (
-        UniqueConstraint(
-            'user_id',
-            'following_id',
-            name='unique_following_user_following'
-        ),
-    )
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            'users.id',
-            ondelete="CASCADE",
-        ),
-    )
-    user: Mapped['User'] = relationship(
-        'User',
-        foreign_keys=[user_id],
-        back_populates='followers',
+    cart_recipe = relationship(
+        'PurchaseCart',
+        foreign_keys=[PurchaseCart.recipe_id],
+        back_populates='cart_recipe',
         lazy='joined',
     )
-    following_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            'users.id',
-            ondelete="CASCADE"
-        ),
-    )
-    following: Mapped['User'] = relationship(
-        'User',
-        foreign_keys=[following_id],
-        back_populates='following',
+    favor_recipe = relationship(
+        'Favorite',
+        foreign_keys=[Favorite.recipe_id],
+        back_populates='favor_recipe',
         lazy='joined',
-    )
-
-    @validates('following')
-    def validate_following(self, key, following):
-        if following == self.user:
-            raise IntegrityError('Нельзя подписываться на самого себя')
-        return following
-
-
-class PurchaseCart(TimeMixin, Base):
-    __tablename__ = "purchase_carts"
-    __table_args__ = (
-        UniqueConstraint(
-            'user_id',
-            'recipes_id',
-            name='unique_recipe_carts_user_carts'
-        ),
-    )
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            "users.id",
-            ondelete="CASCADE"
-        ),
-    )
-    user: Mapped['User'] = relationship(
-        'User',
-        foreign_keys=[user_id],
-        back_populates='user_carts',
-    )
-    recipes_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            "recipes.id",
-            ondelete="CASCADE"
-        ),
-    )
-    recipe: Mapped['Recipe'] = relationship(
-        'Recipe',
-        foreign_keys=[recipes_id],
-        back_populates='recipe_carts',
-    )
-
-
-class Favorite(TimeMixin, Base):
-    __tablename__ = "favorites"
-    __table_args__ = (
-        UniqueConstraint(
-            'user_id',
-            'recipes_id',
-            name='unique_recipe_favorites_user_favorites'
-        ),
-    )
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            "users.id",
-            ondelete="CASCADE"
-        ),
-    )
-    user: Mapped['User'] = relationship(
-        'User',
-        foreign_keys=[user_id],
-        back_populates='user_favorites',
-    )
-    recipes_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            "recipes.id",
-            ondelete="CASCADE"
-        ),
-    )
-    recipe: Mapped['Recipe'] = relationship(
-        'Recipe',
-        foreign_keys=[recipes_id],
-        back_populates='recipe_favorites',
     )

@@ -3,6 +3,7 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 from src.models.base import Base, TimeMixin
 from typing import Annotated, TYPE_CHECKING
 from src.models.base import str_150
+from src.models.recipes.models import Follow, PurchaseCart, Favorite
 
 if TYPE_CHECKING:
     from src.models.recipes.models import Recipe
@@ -25,3 +26,27 @@ class User(TimeMixin, Base):
     is_staff: Mapped[bool] = mapped_column(default=False)
     is_active: Mapped[bool] = mapped_column(default=True)
     recipes: Mapped[list['Recipe']] = relationship(uselist=True)
+    follower = relationship(
+        'Follow',
+        foreign_keys=[Follow.follower_id],
+        back_populates='follower',
+        lazy='joined',
+    )
+    following = relationship(
+        'Follow',
+        foreign_keys=[Follow.following_id],
+        back_populates='following',
+        lazy='joined',
+    )
+    buyer = relationship(
+        'PurchaseCart',
+        foreign_keys=[PurchaseCart.user_id],
+        back_populates='buyer',
+        lazy='joined',
+    )
+    favor_user = relationship(
+        'Favorite',
+        foreign_keys=[Favorite.user_id],
+        back_populates='favor_user',
+        lazy='joined',
+    )
