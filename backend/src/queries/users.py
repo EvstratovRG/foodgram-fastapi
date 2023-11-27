@@ -1,5 +1,5 @@
-from src.schemas import users as users_schema
-from src.models.users.models import User
+from backend.src.schemas import users as users_schema
+from backend.src.models.users.models import User
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import SQLAlchemyError
@@ -7,7 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
-    from config.db import AsyncSession
+    from backend.config.db import AsyncSession
 
 
 async def get_user(
@@ -16,9 +16,10 @@ async def get_user(
         ) -> User | None:
     stmt = (
         select(User).select_from(User).where(User.id == user_id).options(
-            joinedload(User.recipes),
+            joinedload(User.recipes, User.following)
         ),
     )
+    # is_subscribed = 
     result = await session.scalars(stmt)
     return result.first()
 

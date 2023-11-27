@@ -7,14 +7,14 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy_file import ImageField
-from src.models.base import Base, TimeMixin, str_200
+from backend.src.models.base import Base, TimeMixin, str_200
 from typing import Annotated, TYPE_CHECKING
 from sqlalchemy.sql.sqltypes import JSON
 from sqlalchemy.orm import validates
 from sqlalchemy.exc import IntegrityError
 
 if TYPE_CHECKING:
-    from src.models.users.models import User
+    from backend.src.models.users.models import User
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]

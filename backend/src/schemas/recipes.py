@@ -1,8 +1,8 @@
 from pydantic import BaseModel, StringConstraints
 from typing import Annotated
 
-from src.schemas.users import UserBaseSchema
-from src.schemas.base import BaseORMSchema
+from backend.src.schemas.users import UserBaseSchema
+from backend.src.schemas.base import BaseORMSchema
 
 
 str_200 = Annotated[str, StringConstraints(max_length=200)]

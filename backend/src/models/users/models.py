@@ -1,12 +1,13 @@
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from src.models.base import Base, TimeMixin
+from backend.src.models.base import Base, TimeMixin
 from typing import Annotated, TYPE_CHECKING
-from src.models.base import str_150
-from src.models.recipes.models import Follow, PurchaseCart, Favorite
+from backend.src.models.base import str_150
+# from backend.src.models.permissions import UserPermissions
+from backend.src.models.recipes.models import Follow, PurchaseCart, Favorite
 
 if TYPE_CHECKING:
-    from src.models.recipes.models import Recipe
+    from backend.src.models.recipes.models import Recipe
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
@@ -50,3 +51,8 @@ class User(TimeMixin, Base):
         back_populates='favor_user',
         lazy='joined',
     )
+    # permissions = relationship(
+    #     'Permission',
+    #     secondary=UserPermissions,
+    #     backref=backref('user_permissions', lazy='dynamic')
+    # )

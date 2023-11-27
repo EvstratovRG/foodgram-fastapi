@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, status
 from typing import Any
 
-from src.queries import tags as tag_queries
-from src.schemas import recipes as tag_schemas
-from config.db import get_async_session, AsyncSession
+from backend.src.queries import tags as tag_queries
+from backend.src.schemas import recipes as tag_schemas
+from backend.config.db import get_async_session, AsyncSession
 
 
 router = APIRouter(prefix="/tags", tags=["/tags"])

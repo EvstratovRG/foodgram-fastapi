@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, status
 from typing import Any
 
-from src.queries import users as user_queries
-from src.schemas import users as user_schemas
-from src.schemas import base as base_schemas
-from config.db import get_async_session, AsyncSession
+from fastapi_pagination.links import Page
+from fastapi_pagination import paginate
+from backend.src.queries import users as user_queries
+from backend.src.schemas import users as user_schemas
+from backend.src.schemas import base as base_schemas
+from backend.config.db import get_async_session, AsyncSession
 
 
 router = APIRouter(prefix="/users", tags=["/users"])
@@ -17,14 +19,14 @@ router = APIRouter(prefix="/users", tags=["/users"])
 async def get_user(
     user_id: int,
     session: AsyncSession = Depends(get_async_session)
-) -> Any:
+) -> Page[user_schemas.UserBaseSchema]:
     user = await user_queries.get_user(
         user_id=user_id,
         session=session
     )
     if user is None:
         return status.HTTP_404_NOT_FOUND
-    return user_schemas.UserBaseSchema.model_validate(user)
+    return paginate(user_schemas.UserBaseSchema.model_validate(user))
 
 
 # @router.get(

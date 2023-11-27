@@ -1,5 +1,5 @@
-from src.schemas.users import schema as users_schema
-from src.models.users.models import User
+from backend.src.schemas import recipes as recipes_schema
+from backend.src.models.recipes.models import Recipe
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import SQLAlchemyError
@@ -7,68 +7,69 @@ from sqlalchemy.exc import SQLAlchemyError
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
-    from config.db import AsyncSession
+    from backend.config.db import AsyncSession
 
 
-async def get_user(
+async def get_recipe(
         session: 'AsyncSession',
-        user_id: int
-        ) -> User | None:
+        recipe_id: int
+        ) -> Recipe | None:
     stmt = (
-        select(User).select_from(User).where(User.id == user_id).options(
-            joinedload(User.recipes),
+        select(Recipe).select_from(Recipe).where(
+            Recipe.id == recipe_id).options(
+            joinedload(Recipe.recipes),
         ),
     )
     result = await session.scalars(stmt)
     return result.first()
 
 
-async def get_users(session: 'AsyncSession') -> Sequence[User]:
-    stmt = select(User)
+async def get_recipes(session: 'AsyncSession') -> Sequence[Recipe]:
+    stmt = select(Recipe)
     result = await session.scalars(stmt)
     return result.all()
 
 
-async def create_user(
+async def create_recipe(
         session: 'AsyncSession',
-        user_schema: users_schema.CreateUserSchema
-        ) -> User:
-    user = User(
-        username=user_schema.username,
-        first_name=user_schema.first_name,
-        last_name=user_schema.last_name,
-        email=user_schema.email,
+        recipe_schema: recipes_schema.RecipeBaseSchema
+        ) -> Recipe:
+    recipe = Recipe(
+        username=recipe_schema.username,
+        first_name=recipe_schema.first_name,
+        last_name=recipe_schema.last_name,
+        email=recipe_schema.email,
     )
-    session.add(user)
+    session.add(recipe)
     await session.commit()
-    return user
+    return recipe
 
 
-async def update_user(
+async def update_recipe(
         session: 'AsyncSession',
-        user_id: int,
-        user_schema: users_schema.UpdateUserSchema
-        ) -> User | None:
-    user = await get_user(session, user_id)
-    if user is None:
+        recipe_id: int,
+        recipe_schema: recipes_schema.RecipeBaseSchema
+        ) -> Recipe | None:
+    recipe = await get_recipe(session, recipe_id)
+    if recipe is None:
         return None
-    user.username = user_schema.username
-    user.first_name = user_schema.first_name
-    user.last_name = user_schema.last_name
-    user.email = user_schema.email
-    await user.commit()
-    return user
+    recipe.username = recipe_schema.username
+    recipe.first_name = recipe_schema.first_name
+    recipe.last_name = recipe_schema.last_name
+    recipe.email = recipe_schema.email
+    await recipe.commit()
+    return recipe
 
 
-async def delete_user(
+async def delete_recipe(
         session: 'AsyncSession',
-        user_id: int
+        recipe_id: int
         ) -> bool | None:
-    user = await get_user(session, user_id)
-    if user is None:
+    recipe = await get_recipe(session, recipe_id)
+    if recipe is None:
         return None
     try:
-        await session.delete(user)
+        await session.delete(recipe)
         await session.commit()
     except SQLAlchemyError:
         return False

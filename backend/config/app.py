@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 
 def get_fastapi_app() -> FastAPI:
-    from config.initializers import (
+    from backend.config.initializers import (
         init_app,
         init_routers,
     )
