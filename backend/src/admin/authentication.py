@@ -3,7 +3,7 @@ from sqladmin.authentication import AuthenticationBackend
 from fastapi.requests import Request
 from fastapi.responses import Response
 from fastapi import FastAPI
-from backend.config.db import async_engine
+from config.db import async_engine
 
 app = FastAPI()
 

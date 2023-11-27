@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from sqladmin import Admin, ModelView
-from backend.config.db import sync_engine
-from backend.src.models.users.models import User
-from backend.src.models.recipes.models import (
+from config.db import sync_engine
+from src.models.users.models import User
+from src.models.recipes.models import (
     Recipe,
     Tag,
     Ingredient,

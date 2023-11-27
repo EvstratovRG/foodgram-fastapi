@@ -1,20 +1,21 @@
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import Boolean, UniqueConstraint
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from backend.src.models.base import Base, TimeMixin
+from src.models.base import Base, TimeMixin
 from typing import Annotated, TYPE_CHECKING
-from backend.src.models.base import str_150
+from src.models.base import str_150
 # from backend.src.models.permissions import UserPermissions
-from backend.src.models.recipes.models import Follow, PurchaseCart, Favorite
+from src.models.recipes.models import Follow, PurchaseCart, Favorite
+from fastapi_users.db import SQLAlchemyBaseUserTable
 
 if TYPE_CHECKING:
-    from backend.src.models.recipes.models import Recipe
+    from src.models.recipes.models import Recipe
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
 
 
-class User(TimeMixin, Base):
-    __tablename__ = "users"
+class User(SQLAlchemyBaseUserTable, TimeMixin, Base):
+    __tablename__ = "user"
     __table_args__ = (
         UniqueConstraint("username"),
     )
@@ -23,9 +24,29 @@ class User(TimeMixin, Base):
     username: Mapped[str_150] = mapped_column(unique=True)
     first_name: Mapped[str_150 | None]
     last_name: Mapped[str_150 | None]
-    email: Mapped[str_150]
-    is_staff: Mapped[bool] = mapped_column(default=False)
-    is_active: Mapped[bool] = mapped_column(default=True)
+    email: Mapped[str_150] = mapped_column(
+        unique=True,
+        index=True,
+        nullable=False,
+    )
+    is_staff: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        nullable=False,
+    )
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        default=True,
+        nullable=False,
+    )
+    is_superuser: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        nullable=False,
+    )
+    is_verified: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
     recipes: Mapped[list['Recipe']] = relationship(uselist=True)
     follower = relationship(
         'Follow',
@@ -51,8 +72,3 @@ class User(TimeMixin, Base):
         back_populates='favor_user',
         lazy='joined',
     )
-    # permissions = relationship(
-    #     'Permission',
-    #     secondary=UserPermissions,
-    #     backref=backref('user_permissions', lazy='dynamic')
-    # )

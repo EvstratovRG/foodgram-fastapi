@@ -3,10 +3,10 @@ from typing import Any
 
 from fastapi_pagination.links import Page
 from fastapi_pagination import paginate
-from backend.src.queries import users as user_queries
-from backend.src.schemas import users as user_schemas
-from backend.src.schemas import base as base_schemas
-from backend.config.db import get_async_session, AsyncSession
+from src.queries import users as user_queries
+from src.schemas import users as user_schemas
+from src.schemas import base as base_schemas
+from config.db import get_async_session, AsyncSession
 
 
 router = APIRouter(prefix="/users", tags=["/users"])

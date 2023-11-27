@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, status
 from typing import Any
 
-from backend.src.queries import recipes as recipe_queries
-from backend.src.schemas import recipes as recipe_schemas
-from backend.src.schemas import base as base_schemas
-from backend.config.db import get_async_session, AsyncSession
+from src.queries import recipes as recipe_queries
+from src.schemas import recipes as recipe_schemas
+from src.schemas import base as base_schemas
+from config.db import get_async_session, AsyncSession
 
 
 router = APIRouter(prefix="/recipes", tags=["/recipes"])

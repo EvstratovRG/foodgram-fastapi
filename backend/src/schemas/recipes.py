@@ -1,8 +1,8 @@
 from pydantic import BaseModel, StringConstraints
 from typing import Annotated
 
-from backend.src.schemas.users import UserBaseSchema
-from backend.src.schemas.base import BaseORMSchema
+from src.schemas.users import UserBaseSchema
+from src.schemas.base import BaseORMSchema
 
 
 str_200 = Annotated[str, StringConstraints(max_length=200)]
@@ -54,14 +54,14 @@ class Follow(BaseModel):
 class PurchaseCart(BaseModel):
     user_id: int
     user: UserBaseSchema
-    recipes_id: int
+    recipe_id: int
     recipe: RecipeBaseSchema
 
 
 class Favorite(BaseModel):
     user_id: int
     user: UserBaseSchema
-    recipes_id: int
+    recipe_id: int
     recipe: RecipeBaseSchema
 
 

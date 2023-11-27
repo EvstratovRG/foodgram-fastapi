@@ -1,7 +1,7 @@
 import pathlib
 from typing import Any
 
-from backend.config.settings import SiteSettings, ApplicationSettings, DatabaseSettings
+from config.settings import SiteSettings, ApplicationSettings, DatabaseSettings
 
 base_dir: str = pathlib.Path(__file__).parent.parent.as_posix()
 

@@ -2,10 +2,10 @@ from fastapi import APIRouter
 
 
 def get_routers() -> list[APIRouter]:
-    from backend.src.api.endpoints.users import router as users_router
-    from backend.src.api.endpoints.tags import router as tags_touter
-    from backend.src.api.endpoints.ingredients import router as ingredients_router
-    from backend.src.api.endpoints.recipes import router as recipe_router
+    from src.api.endpoints.users import router as users_router
+    from src.api.endpoints.tags import router as tags_touter
+    from src.api.endpoints.ingredients import router as ingredients_router
+    from src.api.endpoints.recipes import router as recipe_router
 
     routers: list[APIRouter] = list()
 

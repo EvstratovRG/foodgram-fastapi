@@ -1,11 +1,11 @@
-from backend.src.models.recipes.models import Ingredient
+from src.models.recipes.models import Ingredient
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
-    from backend.config.db import AsyncSession
+    from config.db import AsyncSession
 
 
 async def get_ingredient(

@@ -7,7 +7,8 @@ from logging.config import fileConfig
 
 from alembic import context
 
-sys.path.insert(0, (pathlib.Path(__file__).parent.parent / 'src').as_posix())
+sys.path.insert(0, (pathlib.Path(__file__).parent.parent.parent).as_posix())
+sys.path.insert(1, (pathlib.Path(__file__).parent.parent / 'src').as_posix())
 
 from src.models import base
 from config import db_config

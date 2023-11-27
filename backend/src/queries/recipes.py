@@ -1,5 +1,5 @@
-from backend.src.schemas import recipes as recipes_schema
-from backend.src.models.recipes.models import Recipe
+from src.schemas import recipes as recipes_schema
+from src.models.recipes.models import Recipe
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import SQLAlchemyError
@@ -7,7 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
-    from backend.config.db import AsyncSession
+    from config.db import AsyncSession
 
 
 async def get_recipe(
