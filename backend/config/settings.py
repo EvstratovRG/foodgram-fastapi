@@ -26,6 +26,7 @@ class ApplicationSettings(BaseSettings):
     description: str
     debug: bool
     version: str
+    secret: str
 
 
 class DatabaseSettings(BaseSettings):

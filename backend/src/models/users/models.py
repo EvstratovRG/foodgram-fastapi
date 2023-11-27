@@ -29,6 +29,7 @@ class User(SQLAlchemyBaseUserTable, TimeMixin, Base):
         index=True,
         nullable=False,
     )
+    password: Mapped[str_150] = mapped_column(nullable=False)
     is_staff: Mapped[bool] = mapped_column(
         Boolean,
         default=False,
