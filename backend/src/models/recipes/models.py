@@ -53,7 +53,7 @@ class Ingredient(TimeMixin, Base):
     id: Mapped[intpk] = mapped_column(autoincrement=True)
     name: Mapped[str_200]
     measurement_unit: Mapped[str_200 | None]
-    recipes: Mapped[list['Recipe']] = relationship(
+    recipe: Mapped[list['Recipe']] = relationship(
         'Recipe',
         secondary='recipe_ingredient',
         back_populates='ingredient',
@@ -207,13 +207,13 @@ class Recipe(TimeMixin, Base):
         'User',
         back_populates='recipe',
     )
-    tags: Mapped[list["Tag"]] = relationship(
+    tag: Mapped[list["Tag"]] = relationship(
         uselist=True,
         secondary='recipe_tag',
         back_populates='recipe',
     )
     # uselist - аналог many = True
-    ingredients: Mapped[list["Ingredient"]] = relationship(
+    ingredient: Mapped[list["Ingredient"]] = relationship(
         uselist=True,
         secondary='recipe_ingredient',
         back_populates='recipe',

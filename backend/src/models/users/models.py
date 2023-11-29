@@ -5,7 +5,6 @@ from typing import Annotated, TYPE_CHECKING
 from src.models.base import str_150
 # from backend.src.models.permissions import UserPermissions
 from src.models.recipes.models import Follow, PurchaseCart, Favorite
-from fastapi_users.db import SQLAlchemyBaseUserTable
 
 if TYPE_CHECKING:
     from src.models.recipes.models import Recipe
@@ -14,7 +13,7 @@ if TYPE_CHECKING:
 intpk = Annotated[int, mapped_column(primary_key=True)]
 
 
-class User(SQLAlchemyBaseUserTable, TimeMixin, Base):
+class User(TimeMixin, Base):
     __tablename__ = "user"
     __table_args__ = (
         UniqueConstraint("username"),
@@ -29,7 +28,7 @@ class User(SQLAlchemyBaseUserTable, TimeMixin, Base):
         index=True,
         nullable=False,
     )
-    password: Mapped[str_150] = mapped_column(nullable=False)
+    hashed_password: Mapped[str_150] = mapped_column(nullable=False)
     is_staff: Mapped[bool] = mapped_column(
         Boolean,
         default=False,
@@ -48,7 +47,7 @@ class User(SQLAlchemyBaseUserTable, TimeMixin, Base):
     is_verified: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False
     )
-    recipes: Mapped[list['Recipe']] = relationship(uselist=True)
+    recipe: Mapped[list['Recipe']] = relationship(uselist=True)
     follower = relationship(
         'Follow',
         foreign_keys=[Follow.follower_id],

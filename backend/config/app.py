@@ -1,4 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+
+origins = ['*']
 
 
 def get_fastapi_app() -> FastAPI:
@@ -8,6 +12,13 @@ def get_fastapi_app() -> FastAPI:
     )
 
     application: FastAPI = init_app()
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     init_routers(application)
 

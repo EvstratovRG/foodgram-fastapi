@@ -26,9 +26,9 @@ def get_sync_session():
         db.close()
 
 
-def get_async_session():
+async def get_async_session():
     db = AsyncSession()
     try:
         yield db
     finally:
-        db.close()
+        await db.close()
