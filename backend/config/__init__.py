@@ -1,11 +1,26 @@
 import pathlib
-from typing import Any
+from functools import lru_cache
 
 from config.settings import SiteSettings, ApplicationSettings, DatabaseSettings
 
 base_dir: str = pathlib.Path(__file__).parent.parent.as_posix()
 
 
-app_config: dict[str, Any] = ApplicationSettings().model_dump()
-site_config: dict[str, Any] = SiteSettings().model_dump()
-db_config: dict[str, Any] = DatabaseSettings()
+@lru_cache
+def get_app_config() -> ApplicationSettings:
+    return ApplicationSettings()
+
+
+@lru_cache
+def get_site_config() -> SiteSettings:
+    return SiteSettings()
+
+
+@lru_cache
+def get_db_config() -> DatabaseSettings:
+    return DatabaseSettings()
+
+
+app_config = get_app_config()
+site_config = get_site_config()
+db_config = get_db_config()

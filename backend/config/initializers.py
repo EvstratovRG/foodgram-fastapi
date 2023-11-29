@@ -2,9 +2,11 @@ from fastapi import FastAPI
 
 
 def init_app() -> FastAPI:
-    from config import app_config
+    from config import get_app_config
 
-    app = FastAPI(**app_config)
+    app_config = get_app_config()
+
+    app = FastAPI(**app_config.model_dump())
     return app
 
 

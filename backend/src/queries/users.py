@@ -1,14 +1,27 @@
+from fastapi import HTTPException, status
 from src.schemas import users as users_schema
 from src.models.users.models import User
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError
 from src.hasher import Hasher
 
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
-    from config.db import AsyncSession
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+
+async def get_user_by_email(
+        session: 'AsyncSession',
+        email: str
+        ) -> User | None:
+    """Получение пользователя из бд по email."""
+    stmt = (
+        select(User).where(User.email == email)
+    )
+    result = await session.scalars(stmt)
+    return result.first()
 
 
 async def get_user(
@@ -19,15 +32,15 @@ async def get_user(
         select(User).select_from(User).where(User.id == user_id)
     ).options(
             joinedload(User.recipe).joinedload(User.following)
-        ),
+        )
     result = await session.scalars(stmt)
-    return result.first()
+    return result.unique().first()
 
 
 async def get_users(session: 'AsyncSession') -> Sequence[User]:
     stmt = select(User)
-    result = await session.execute(stmt)
-    return result.all()
+    result = await session.scalars(stmt)
+    return result.unique().all()
 
 
 async def create_user(
@@ -42,12 +55,14 @@ async def create_user(
         hashed_password=Hasher.get_password_hash(user_schema.password)
     )
     try:
-        session.begin()
         session.add(user)
         await session.commit()
-    except SQLAlchemyError:
-        message = "Произошла ошибка при создании пользователя"
-        raise SQLAlchemyError(message)
+    except IntegrityError as exc:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc.orig),
+        )
     return user
 
 
@@ -56,7 +71,6 @@ async def update_user(
         user_id: int,
         user_schema: users_schema.UpdateUserSchema
         ) -> User | None:
-    session.begin()
     user = await get_user(session, user_id)
     if user is None:
         return None
@@ -78,7 +92,7 @@ async def delete_user(
     try:
         await session.delete(user)
         await session.commit()
-    except SQLAlchemyError:
+    except IntegrityError:
         return False
     return True
 
@@ -89,6 +103,6 @@ async def delete_all_users(
     users = select(User)
     try:
         session.delete(users)
-    except SQLAlchemyError:
+    except IntegrityError:
         return False
     return True

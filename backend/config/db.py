@@ -2,8 +2,9 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from config import db_config
+from config import get_db_config
 
+db_config = get_db_config()
 
 async_engine = create_async_engine(
     url=db_config.database_url_asyncpg,

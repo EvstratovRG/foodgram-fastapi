@@ -13,3 +13,12 @@ class StatusSchema(BaseModel):
 class DetailSchema(BaseModel):
     """Схема детального ответа."""
     detail: str
+
+
+class Token(BaseModel):
+    token: str
+
+
+class AuthLoginSchema(BaseModel):
+    email: str
+    password: str

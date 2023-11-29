@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, status
 from typing import Any
-
-from fastapi_pagination.links import Page
-from fastapi_pagination import paginate
-
+from src.api.endpoints.auth import login_to_get_token
+from src.api.exceptions import users as user_exceptions
 from src.queries import users as user_queries
 from src.schemas import users as user_schemas
 from src.schemas import base as base_schemas
-from sqlalchemy.exc import SQLAlchemyError
+from jose import jwt, JWTError
+from config import app_config
+
 from config.db import get_async_session, AsyncSession
 
 
@@ -16,41 +16,55 @@ router = APIRouter(prefix="/users", tags=["/users"])
 
 @router.get(
     "/{user_id}",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=user_schemas.UserBaseSchema
 )
 async def get_user(
     user_id: int,
     session: AsyncSession = Depends(get_async_session)
-) -> Page[user_schemas.UserBaseSchema]:
+) -> Any:
     user = await user_queries.get_user(
         user_id=user_id,
         session=session
     )
     if user is None:
-        return status.HTTP_404_NOT_FOUND
-    return paginate(user_schemas.UserBaseSchema.model_validate(user))
+        raise user_exceptions.UserNotFoundException
+    return user
 
 
-# @router.get(
-#     "/me",
-#     status_code=status.HTTP_200_OK
-# )
-# async def get_current_user(
-#     user: User = Depends(current_user),
-#     session: AsyncSession = Depends(get_async_session)
-# ) -> Any:
-#     user = await user_queries.get_user(
-#         user_id=user.id,
-#         session=session
-#     )
-#     if user is None:
-#         return status.HTTP_404_NOT_FOUND
-#     return user_schemas.UserBaseSchema.model_validate(user)
+@router.get(
+    "/me",
+    status_code=status.HTTP_200_OK,
+    response_model=user_schemas.UserBaseSchema
+)
+async def get_current_user(
+    token: str = Depends(login_to_get_token),
+    session: AsyncSession = Depends(get_async_session)
+) -> Any:
+    try:
+        payload = jwt.decode(
+            token,
+            app_config.secret,
+            app_config.algorithm
+        )
+        email = payload.get("sub")
+        if email is None:
+            raise user_exceptions.WrongСredentials
+    except JWTError:
+        raise user_exceptions.WrongСredentials
+    user = await user_queries.get_user(
+        email=email,
+        session=session
+    )
+    if user is None:
+        raise user_exceptions.UserNotFoundException
+    return user
 
 
 @router.get(
     "",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=list[user_schemas.UserBaseSchema]
 )
 async def get_users(
     session: AsyncSession = Depends(get_async_session)
@@ -58,34 +72,35 @@ async def get_users(
     users = await user_queries.get_users(
         session=session
     )
-    return [user_schemas.UserBaseSchema.model_validate(user) for user in users]
+    if users is None:
+        raise user_exceptions.SomethingGoesWrong
+    return users
 
 
 @router.post(
     "",
     status_code=status.HTTP_201_CREATED,
-    description='Регистрация пользователя'
+    description='Регистрация пользователя',
+    response_model=user_schemas.UserBaseSchema
 )
 async def create_user(
     user_schema: user_schemas.CreateUserSchema,
-    session: AsyncSession = Depends(get_async_session),
+    session: AsyncSession = Depends(get_async_session)
 ) -> Any:
     """Регистрация пользователя."""
-
-    try:
-        created_user = await user_queries.create_user(
-            session=session,
-            user_schema=user_schema
-        )
-    except SQLAlchemyError:
-        message = 'Что то пошло не так'
-        raise SQLAlchemyError(message)
-    return user_schemas.UserBaseSchema.model_validate(created_user)
+    created_user = await user_queries.create_user(
+        session=session,
+        user_schema=user_schema
+    )
+    if created_user is None:
+        raise user_exceptions.AlreadyExistsException
+    return created_user
 
 
 @router.put(
     "/{user_id}",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=user_schemas.UserBaseSchema
 )
 async def update_user(
     user_id: int,
@@ -99,12 +114,13 @@ async def update_user(
     )
     if not update_user:
         return status.HTTP_404_NOT_FOUND
-    return user_schemas.UserBaseSchema.model_validate(updated_user)
+    return updated_user
 
 
 @router.delete(
     "/{user_id}",
-    status_code=status.HTTP_202_ACCEPTED
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=base_schemas.StatusSchema
 )
 async def delete_user(
     user_id: int,
@@ -116,12 +132,13 @@ async def delete_user(
     )
     if not delete_user:
         return status.HTTP_404_NOT_FOUND
-    return base_schemas.StatusSchema(success=deleted_user)
+    return deleted_user
 
 
 @router.delete(
     "",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=base_schemas.StatusSchema
 )
 async def delete_all_users(
     session: AsyncSession = Depends(get_async_session),
@@ -129,6 +146,6 @@ async def delete_all_users(
     deleted_all_users = await user_queries.delete_all_users(
         session=session
     )
-    if not delete_all_users:
+    if not deleted_all_users:
         return status.HTTP_400_BAD_REQUEST
-    return base_schemas.StatusSchema(success=deleted_all_users)
+    return deleted_all_users

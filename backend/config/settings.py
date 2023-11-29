@@ -27,6 +27,8 @@ class ApplicationSettings(BaseSettings):
     debug: bool
     version: str
     secret: str
+    token_expire: int
+    algorithm: str
 
 
 class DatabaseSettings(BaseSettings):
