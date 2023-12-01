@@ -27,5 +27,6 @@ class CreateUserSchema(BaseModel):
     password: str_150
 
 
-class UpdateUserSchema(CreateUserSchema):
-    pass
+class ChangeUserPassword(BaseModel):
+    new_password: str_150
+    current_password: str_150

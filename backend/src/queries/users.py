@@ -29,10 +29,10 @@ async def get_user(
         user_id: int
         ) -> User | None:
     stmt = (
-        select(User).select_from(User).where(User.id == user_id)
-    ).options(
-            joinedload(User.recipe).joinedload(User.following)
-        )
+        select(User).select_from(User).where(User.id == user_id))
+    # ).options(
+    #         joinedload(User.recipe).joinedload(User.following)
+    #     )
     result = await session.scalars(stmt)
     return result.unique().first()
 
@@ -66,43 +66,40 @@ async def create_user(
     return user
 
 
-async def update_user(
+async def update_password(
         session: 'AsyncSession',
         user_id: int,
-        user_schema: users_schema.UpdateUserSchema
+        current_password: str
         ) -> User | None:
     user = await get_user(session, user_id)
     if user is None:
         return None
-    user.username = user_schema.username
-    user.first_name = user_schema.first_name
-    user.last_name = user_schema.last_name
-    user.email = user_schema.email
-    await user.commit()
+    user.hashed_password = current_password
+    await session.commit()
     return user
 
 
-async def delete_user(
-        session: 'AsyncSession',
-        user_id: int
-        ) -> bool | None:
-    user = await get_user(session, user_id)
-    if user is None:
-        return None
-    try:
-        await session.delete(user)
-        await session.commit()
-    except IntegrityError:
-        return False
-    return True
+# async def delete_user(
+#         session: 'AsyncSession',
+#         user_id: int
+#         ) -> bool | None:
+#     user = await get_user(session, user_id)
+#     if user is None:
+#         return None
+#     try:
+#         await session.delete(user)
+#         await session.commit()
+#     except IntegrityError:
+#         return False
+#     return True
 
 
-async def delete_all_users(
-        session: 'AsyncSession',
-        ) -> bool | None:
-    users = select(User)
-    try:
-        session.delete(users)
-    except IntegrityError:
-        return False
-    return True
+# async def delete_all_users(
+#         session: 'AsyncSession',
+#         ) -> bool | None:
+#     users = select(User)
+#     try:
+#         session.delete(users)
+#     except IntegrityError:
+#         return False
+#     return True

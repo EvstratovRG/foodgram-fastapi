@@ -15,6 +15,10 @@ class DetailSchema(BaseModel):
     detail: str
 
 
+class ExceptionSchema(DetailSchema):
+    status_code: int
+
+
 class Token(BaseModel):
     token: str
 
@@ -22,3 +26,7 @@ class Token(BaseModel):
 class AuthLoginSchema(BaseModel):
     email: str
     password: str
+
+
+class UpdatePasswordResponseSchema(ExceptionSchema):
+    pass
