@@ -6,7 +6,6 @@ from src.api.exceptions import users as user_exceptions
 from src.queries import users as user_queries
 from src.schemas import users as user_schemas
 from src.schemas import base as base_schemas
-from starlette.requests import Request
 from src.hasher import Hasher
 
 from config.db import get_async_session, AsyncSession
@@ -23,9 +22,9 @@ router = APIRouter(prefix="/users", tags=["/users"])
         base_schemas.ExceptionSchema)
 )
 async def get_users(
-    request: Request,
     session: AsyncSession = Depends(get_async_session),
 ) -> Any:
+    """Получить список всех пользователей."""
     users = await user_queries.get_users(
         session=session
     )
@@ -54,22 +53,6 @@ async def create_user(
     return created_user
 
 
-# @router.delete(
-#     "",
-#     status_code=status.HTTP_200_OK,
-#     response_model=base_schemas.StatusSchema
-# )
-# async def delete_all_users(
-#     session: AsyncSession = Depends(get_async_session),
-# ) -> Any:
-#     deleted_all_users = await user_queries.delete_all_users(
-#         session=session
-#     )
-#     if not deleted_all_users:
-#         return status.HTTP_400_BAD_REQUEST
-#     return deleted_all_users
-
-
 @router.get(
     "/me",
     status_code=status.HTTP_200_OK,
@@ -78,6 +61,7 @@ async def create_user(
 async def get_me(
     user: User = Depends(get_current_user),
 ) -> Any:
+    """Получить текущего пользователя."""
     return user
 
 
@@ -89,17 +73,18 @@ async def get_me(
         base_schemas.ExceptionSchema
     )
 )
-async def change_user_password(
+async def change_users_password(
     user_schema: user_schemas.ChangeUserPassword,
     user: User = Depends(get_me),
     session: AsyncSession = Depends(get_async_session),
 ) -> Any:
+    """Изменить пароль текущего пользователя."""
     validate_current_password = Hasher.verify_password(
         user_schema.current_password,
         user.hashed_password
     )
     if not validate_current_password:
-        raise user_exceptions.WrongСredentials('Пароль не соотвествует')
+        raise user_exceptions.WrongPassword
     changed_password = await user_queries.update_password(
         session=session,
         user_id=user.id,
@@ -113,6 +98,7 @@ async def change_user_password(
         status_code=status.HTTP_204_NO_CONTENT,
         detail='Пароль успешно изменен'
     )
+# ПРОВЕРИТЬ ПОЧЕМУ НЕ ФИКСИРУЕТСЯ ИЗМЕНЕННЫЙ ПАРОЛЬ
 
 
 @router.get(
@@ -124,6 +110,7 @@ async def get_user(
     user_id: int,
     session: AsyncSession = Depends(get_async_session)
 ) -> Any:
+    """Получить пользователя по id."""
     user = await user_queries.get_user(
         user_id=user_id,
         session=session
@@ -131,20 +118,3 @@ async def get_user(
     if user is None:
         raise user_exceptions.UserNotFoundException
     return user
-
-# @router.delete(
-#     "/{user_id}",
-#     status_code=status.HTTP_202_ACCEPTED,
-#     response_model=base_schemas.StatusSchema
-# )
-# async def delete_user(
-#     user_id: int,
-#     session: AsyncSession = Depends(get_async_session),
-# ) -> Any:
-#     deleted_user = await user_queries.delete_user(
-#         session=session,
-#         user_id=user_id
-#     )
-#     if not delete_user:
-#         return status.HTTP_404_NOT_FOUND
-#     return deleted_user

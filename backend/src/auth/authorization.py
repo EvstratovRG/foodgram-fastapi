@@ -2,7 +2,6 @@ from src.queries import users as user_queries
 from src.hasher import Hasher
 from src.models.users.models import User
 from datetime import timedelta, datetime
-from config import get_app_config
 from typing import TYPE_CHECKING
 from config import app_config
 from src.api.exceptions import users as user_exceptions
@@ -26,12 +25,11 @@ async def authenticate_user(
     return user
 
 
-def create_access_token(
+def create_token(
         data: dict,
         expires_delta: timedelta | None
 ):
     """Метод создания токена из data."""
-    app_config = get_app_config()
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta

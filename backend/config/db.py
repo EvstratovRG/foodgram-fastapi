@@ -20,6 +20,7 @@ SyncSession = sessionmaker(sync_engine)
 
 
 def get_sync_session():
+    """Устанавливаем синхронную сесситю с базой данных."""
     db = SyncSession()
     try:
         yield db
@@ -28,6 +29,7 @@ def get_sync_session():
 
 
 async def get_async_session():
+    """Устанавливаем асинхронную сессию с базой данных."""
     db = AsyncSession()
     try:
         yield db

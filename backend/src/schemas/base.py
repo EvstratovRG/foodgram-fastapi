@@ -7,7 +7,8 @@ class BaseORMSchema(BaseModel):
 
 
 class StatusSchema(BaseModel):
-    success: bool
+    status_code: int
+    is_deleted: bool
 
 
 class DetailSchema(BaseModel):

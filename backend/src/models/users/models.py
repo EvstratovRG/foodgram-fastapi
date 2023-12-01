@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, UniqueConstraint
+from sqlalchemy import Boolean, UniqueConstraint, String
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from src.models.base import Base, TimeMixin
 from typing import Annotated, TYPE_CHECKING
@@ -32,6 +32,15 @@ class User(TimeMixin, Base):
         Boolean,
         default=False,
         nullable=False,
+    )
+    token: Mapped[str] = mapped_column(
+        String(250),
+        nullable=True,
+    )
+    is_authenticated: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        nullable=False
     )
     is_active: Mapped[bool] = mapped_column(
         Boolean,
