@@ -16,8 +16,11 @@ async def authenticate_user(
         password: str,
         session: 'AsyncSession',
 ) -> User | None:
-    """Метод для проверки аутентификации пользователя по имейлу."""
-    user = await user_queries.get_user_by_email(email=email, session=session)
+    """Метод для проверки аутентификации пользователя по имейлу при логине."""
+    user = await user_queries.get_user_by_email(
+        email=email,
+        session=session
+    )
     if user is None:
         return
     if not Hasher.verify_password(password, user.hashed_password):
@@ -67,9 +70,10 @@ async def get_user_by_decode_token(
 ) -> User:
     """Получение пользователя путём декодирования токена с помощью email."""
     email = decode_token(token)
-    user = await user_queries.get_user_by_email(
+    user = await user_queries.get_user_by_email_with_checking_token(
         email=email,
-        session=session
+        session=session,
+        token=token
     )
     return user
 
@@ -82,9 +86,9 @@ async def get_user(token, session):
     return user
 
 
-async def check_user(token, session):
-    """Проверить, является ли пользователем."""
-    is_user = await get_user_by_decode_token(token, session)
-    if is_user is None:
-        return False
-    return True
+# async def check_user(token, session):
+#     """Проверить, является ли пользователем."""
+#     is_user = await get_user_by_decode_token(token, session)
+#     if is_user is None:
+#         return False
+#     return True

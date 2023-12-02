@@ -79,7 +79,6 @@ async def change_users_password(
     session: AsyncSession = Depends(get_async_session),
 ) -> Any:
     """Изменить пароль текущего пользователя."""
-    # user_queries.compare_incomming_token_with_db_token(session, token, email)
     validate_current_password = Hasher.verify_password(
         user_schema.current_password,
         user.hashed_password
@@ -90,7 +89,7 @@ async def change_users_password(
         session=session,
         user_id=user.id,
         current_password=Hasher.get_password_hash(
-            user_schema.current_password
+            user_schema.new_password
         )
     )
     if not changed_password:
