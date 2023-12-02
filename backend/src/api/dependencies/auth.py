@@ -1,8 +1,8 @@
 from fastapi import Request, Depends
 from config.db import get_async_session, AsyncSession
 from src.auth.authorization import (
-    get_user_by_decode_token,
-    check_is_user_by_decode_token
+    get_user,
+    check_user,
 )
 from src.api.exceptions.users import WrongСredentials
 
@@ -15,7 +15,7 @@ async def get_current_user(
     token = request.headers.get('Token')
     if not token:
         raise WrongСredentials
-    user = await get_user_by_decode_token(token, session)
+    user = await get_user(token, session)
     return user
 
 
@@ -25,5 +25,5 @@ async def check_user_with_token(
 ):
     """Является ли токен подлинным."""
     token = request.headers.get('Token')
-    is_user: bool = await check_is_user_by_decode_token(token, session)
+    is_user: bool = await check_user(token, session)
     return is_user

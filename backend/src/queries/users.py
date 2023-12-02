@@ -24,6 +24,21 @@ async def get_user_by_email(
     return result.first()
 
 
+# async def compare_incomming_token_with_db_token(
+#         session: 'AsyncSession',
+#         token: str,
+#         email: str
+# ) -> bool:
+#     """Проверяет полученный из реквеста токен
+#     с токеном сохраненным в базу данных."""
+#     user = await get_user_by_email(session, email)
+#     stmt = (
+#         select(user).where(user.token == token)
+#     )
+#     result = await session.scalar(stmt)
+#     return bool(result)
+
+
 async def get_user(
         session: 'AsyncSession',
         user_id: int

@@ -65,26 +65,26 @@ async def get_user_by_decode_token(
         token: str,
         session: 'AsyncSession'
 ) -> User:
-    """Получение пользователя путём декодирования токена."""
+    """Получение пользователя путём декодирования токена с помощью email."""
     email = decode_token(token)
     user = await user_queries.get_user_by_email(
         email=email,
         session=session
     )
+    return user
+
+
+async def get_user(token, session):
+    """Получить пользователя."""
+    user = await get_user_by_decode_token(token, session)
     if user is None:
         raise user_exceptions.UserNotFoundException
     return user
 
 
-async def check_is_user_by_decode_token(
-        token: str,
-        session: 'AsyncSession'
-) -> bool:
-    email = decode_token(token)
-    is_user = await user_queries.get_user_by_email(
-        email=email,
-        session=session
-    )
+async def check_user(token, session):
+    """Проверить, является ли пользователем."""
+    is_user = await get_user_by_decode_token(token, session)
     if is_user is None:
-        raise False
+        return False
     return True

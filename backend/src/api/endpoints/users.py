@@ -79,6 +79,7 @@ async def change_users_password(
     session: AsyncSession = Depends(get_async_session),
 ) -> Any:
     """Изменить пароль текущего пользователя."""
+    # user_queries.compare_incomming_token_with_db_token(session, token, email)
     validate_current_password = Hasher.verify_password(
         user_schema.current_password,
         user.hashed_password
@@ -98,7 +99,6 @@ async def change_users_password(
         status_code=status.HTTP_204_NO_CONTENT,
         detail='Пароль успешно изменен'
     )
-# ПРОВЕРИТЬ ПОЧЕМУ НЕ ФИКСИРУЕТСЯ ИЗМЕНЕННЫЙ ПАРОЛЬ
 
 
 @router.get(
