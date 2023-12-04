@@ -33,6 +33,12 @@ class BaseTagSchema(BaseModel):
     color: str
 
 
+class CreateTagSchema(BaseModel):
+    name: str_200
+    slug: str_200
+    color: str
+
+
 class RecipeBaseSchema(BaseORMSchema):
     name: str_50
     text: str

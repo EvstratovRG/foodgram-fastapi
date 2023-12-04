@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, StringConstraints, EmailStr
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, EmailStr
 from typing import Annotated
 
 str_150 = Annotated[str, StringConstraints(max_length=150)]
@@ -14,6 +14,7 @@ class UserBaseSchema(BaseModel):
     first_name: str_150
     last_name: str_150
     email: email_150
+    is_subscribed: bool = Field(default=False)
 
 
 class CreateUserSchema(BaseModel):

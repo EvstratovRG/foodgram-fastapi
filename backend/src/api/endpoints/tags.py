@@ -11,7 +11,8 @@ router = APIRouter(prefix="/tags", tags=["/tags"])
 
 @router.get(
     "/{tag_id}",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=tag_schemas.BaseTagSchema
 )
 async def get_tag(
     tag_id: int,
@@ -23,12 +24,13 @@ async def get_tag(
     )
     if tag is None:
         return status.HTTP_404_NOT_FOUND
-    return tag_schemas.TagSchema.model_validate(tag)
+    return tag
 
 
 @router.get(
     "",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=list[tag_schemas.BaseTagSchema]
 )
 async def get_tags(
     session: AsyncSession = Depends(get_async_session)
@@ -36,4 +38,20 @@ async def get_tags(
     tags = await tag_queries.get_tags(
         session=session
     )
-    return [tag_schemas.TagSchema.model_validate(tag) for tag in tags]
+    return tags
+
+
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    response_model=tag_schemas.BaseTagSchema
+)
+async def post_tag(
+    schema: tag_schemas.CreateTagSchema,
+    session: AsyncSession = Depends(get_async_session),
+) -> Any:
+    tag = await tag_queries.post_tag(
+        session=session,
+        tag_schema=schema
+    )
+    return tag

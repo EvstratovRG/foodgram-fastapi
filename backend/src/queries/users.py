@@ -2,6 +2,7 @@ from fastapi import HTTPException, status
 from src.schemas import users as users_schema
 from src.models.users.models import User
 from sqlalchemy import select
+# from sqlalchemy.orm import selectinload, outerjoin
 # from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError
 from src.hasher import Hasher
@@ -30,8 +31,8 @@ async def get_user_by_email_with_checking_token(
         token: str,
         ) -> User | None:
     """Получение пользователя из базы данных по email и проверкой пароля."""
-    stmt = (
-        select(User).where(User.email == email).where(User.token == token)
+    stmt = select(User).where(
+        (User.email == email) & (User.token == token)
     )
     result = await session.scalars(stmt)
     return result.first()
@@ -44,11 +45,31 @@ async def get_user(
     """Получить пользователя по id из базы данных."""
     stmt = (
         select(User).select_from(User).where(User.id == user_id))
+    result = await session.scalars(stmt)
+    return result.unique().first()
     # ).options(
     #         joinedload(User.recipe).joinedload(User.following)
     #     )
-    result = await session.scalars(stmt)
-    return result.unique().first()
+
+
+# async def get_user_with_relationships(
+#         session: 'AsyncSession',
+#         user_id: int
+#         ) -> User | None:
+#     """Получить пользователя по id
+#     из базы данных с загруженными отношениями."""
+#     stmt = (
+#         select(User)
+#         .options(selectinload(User.follower), selectinload(User.following))
+#         .where(User.id == user_id)
+#     )
+#     result = await session.scalars(stmt)
+#     with_subscribed = any(
+#         follow.following_id == result.id
+#         for follow in stmt.follower
+#     )
+
+#     return with_subscribed.unique().first()
 
 
 async def get_users(session: 'AsyncSession') -> Sequence[User]:

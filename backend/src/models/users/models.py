@@ -1,7 +1,8 @@
 from sqlalchemy import Boolean, UniqueConstraint, String
 from sqlalchemy.orm import mapped_column, Mapped, relationship
+from sqlalchemy.ext.hybrid import hybrid_property
 from src.models.base import Base, TimeMixin
-from typing import Annotated, TYPE_CHECKING
+from typing import Annotated, TYPE_CHECKING, Self
 from src.models.base import str_150
 from src.models.recipes.models import Follow, PurchaseCart, Favorite
 
@@ -80,3 +81,7 @@ class User(TimeMixin, Base):
         back_populates='favor_user',
         lazy='joined',
     )
+
+    @hybrid_property
+    def is_subscribed(self: Self) -> bool:
+        return bool(self.follower)
