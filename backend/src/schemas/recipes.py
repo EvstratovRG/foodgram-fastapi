@@ -23,7 +23,12 @@ class RecipeTagSchema(BaseModel):
 class BaseIngredientSchema(BaseModel):
     id: int
     name: str_200
-    measurement_unit: int
+    measurement_unit: str_200
+
+
+class CreateIngredientSchema(BaseModel):
+    name: str_200
+    measurement_unit: str_200
 
 
 class BaseTagSchema(BaseModel):

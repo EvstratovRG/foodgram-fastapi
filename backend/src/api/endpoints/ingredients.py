@@ -11,7 +11,8 @@ router = APIRouter(prefix="/ingredients", tags=["/ingredients"])
 
 @router.get(
     "/{ingredient_id}",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=ingredient_schemas.BaseIngredientSchema
 )
 async def get_ingredient(
     ingredient_id: int,
@@ -23,12 +24,13 @@ async def get_ingredient(
     )
     if ingredient is None:
         return status.HTTP_404_NOT_FOUND
-    return ingredient_schemas.IngredientSchema.model_validate(ingredient)
+    return ingredient
 
 
 @router.get(
     "",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=list[ingredient_schemas.BaseIngredientSchema]
 )
 async def get_ingredients(
     session: AsyncSession = Depends(get_async_session)
@@ -36,7 +38,20 @@ async def get_ingredients(
     ingredients = await ingredient_queries.get_ingredients(
         session=session
     )
-    return (
-        [ingredient_schemas.TagSchema.model_validate(ingredient)
-         for ingredient in ingredients]
-        )
+    return ingredients
+
+
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    response_model=ingredient_schemas.BaseIngredientSchema
+)
+async def post_ingredient(
+    schema: ingredient_schemas.CreateIngredientSchema,
+    session: AsyncSession = Depends(get_async_session),
+) -> Any:
+    ingredient = await ingredient_queries.post_ingredient(
+        session=session,
+        ingredient_schema=schema
+    )
+    return ingredient
