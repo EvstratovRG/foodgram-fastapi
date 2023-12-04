@@ -8,10 +8,11 @@ from sqlalchemy import (
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy_file import ImageField
 from src.models.base import Base, TimeMixin, str_200
-from typing import Annotated, TYPE_CHECKING
+from typing import Annotated, TYPE_CHECKING, Self
 from sqlalchemy.sql.sqltypes import JSON
 from sqlalchemy.orm import validates
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.hybrid import hybrid_property
 
 if TYPE_CHECKING:
     from src.models.users.models import User
@@ -230,3 +231,11 @@ class Recipe(TimeMixin, Base):
         back_populates='favor_recipe',
         lazy='joined',
     )
+
+    @hybrid_property
+    def is_in_shopping_cart(self: Self) -> bool:
+        return bool(self.cart_recipe)
+
+    @hybrid_property
+    def is_favorited(self: Self) -> bool:
+        return bool(self.favor_recipe)

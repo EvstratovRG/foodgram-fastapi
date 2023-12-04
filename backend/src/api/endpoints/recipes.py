@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, status
 from typing import Any
-
+from src.api.endpoints.users import get_me
+from src.models.users.models import User
 from src.queries import recipes as recipe_queries
 from src.schemas import recipes as recipe_schemas
 from src.schemas import base as base_schemas
+from src.api.exceptions.recipes import RecipeNotFoundException
 from config.db import get_async_session, AsyncSession
 
 
@@ -12,7 +14,9 @@ router = APIRouter(prefix="/recipes", tags=["/recipes"])
 
 @router.get(
     "/{recipe_id}",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=(recipe_schemas.RecipeBaseSchema |
+                    base_schemas.ExceptionSchema)
 )
 async def get_recipe(
     recipe_id: int,
@@ -23,13 +27,14 @@ async def get_recipe(
         session=session
     )
     if recipe is None:
-        return status.HTTP_404_NOT_FOUND
-    return recipe_schemas.RecipeBaseSchema.model_validate(recipe)
+        raise RecipeNotFoundException
+    return recipe
 
 
 @router.get(
     "",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=list[recipe_schemas.RecipeBaseSchema]
 )
 async def get_recipes(
     session: AsyncSession = Depends(get_async_session)
@@ -37,27 +42,31 @@ async def get_recipes(
     recipes = await recipe_queries.get_recipes(
         session=session
     )
-    return [recipe_schemas.RecipeBaseSchema.model_validate(recipe) for recipe in recipes]
+    return recipes
 
 
 @router.post(
     "",
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    response_model=recipe_schemas.RecipeBaseSchema
 )
 async def create_recipe(
-    recipe_schema: recipe_schemas.RecipeBaseSchema,
+    recipe_schema: recipe_schemas.CreateRecipeSchema,
     session: AsyncSession = Depends(get_async_session),
+    author: User = Depends(get_me),
 ) -> Any:
     created_recipe = await recipe_queries.create_recipe(
         session=session,
-        recipe_schema=recipe_schema
+        recipe_schema=recipe_schema,
+        author=author
     )
-    return recipe_schemas.RecipeBaseSchema.model_validate(created_recipe)
+    return created_recipe
 
 
 @router.put(
     "/{recipe_id}",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=recipe_schemas.RecipeBaseSchema
 )
 async def update_recipe(
     recipe_id: int,
@@ -71,12 +80,13 @@ async def update_recipe(
     )
     if not updated_recipe:
         return status.HTTP_404_NOT_FOUND
-    return recipe_schemas.RecipeBaseSchema.model_validate(updated_recipe)
+    return updated_recipe
 
 
 @router.delete(
     "/{recipe_id}",
-    status_code=status.HTTP_202_ACCEPTED
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=base_schemas.StatusSchema
 )
 async def delete_recipe(
     recipe_id: int,
@@ -88,4 +98,4 @@ async def delete_recipe(
     )
     if not deleted_recipe:
         return status.HTTP_404_NOT_FOUND
-    return base_schemas.StatusSchema(success=deleted_recipe)
+    return deleted_recipe

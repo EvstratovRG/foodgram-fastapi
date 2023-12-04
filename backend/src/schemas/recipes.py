@@ -1,9 +1,8 @@
-from pydantic import BaseModel, StringConstraints
+from pydantic import BaseModel, StringConstraints, Field
 from typing import Annotated
 
 from src.schemas.users import UserBaseSchema
 from src.schemas.base import BaseORMSchema
-
 
 str_200 = Annotated[str, StringConstraints(max_length=200)]
 str_50 = Annotated[str, StringConstraints(max_length=50)]
@@ -15,15 +14,28 @@ class RecipeIngredientSchema(BaseModel):
     amount: int
 
 
+class IngredientAmount(BaseModel):
+    id: int
+    amount: int
+
+
 class RecipeTagSchema(BaseModel):
     recipe_id: int
     tag_id: int
+
+
+class TagId(BaseModel):
+    id: int
 
 
 class BaseIngredientSchema(BaseModel):
     id: int
     name: str_200
     measurement_unit: str_200
+
+
+class IngredientThroughSchema(BaseIngredientSchema):
+    amount: int
 
 
 class CreateIngredientSchema(BaseModel):
@@ -49,10 +61,20 @@ class RecipeBaseSchema(BaseORMSchema):
     text: str
     cooking_time: int
     image: str
-    author_id: int
     author: UserBaseSchema
     tags: list[BaseTagSchema]
-    ingredients: list[BaseIngredientSchema]
+    ingredients: list[IngredientThroughSchema]
+    is_favorited: bool = Field(default=False)
+    is_in_shopping_cart: bool = Field(default=False)
+
+
+class CreateRecipeSchema(BaseModel):
+    name: str_50
+    text: str
+    cooking_time: int
+    image: str
+    tags: list[int]
+    ingredients: list[IngredientAmount]
 
 
 class Follow(BaseModel):
@@ -74,15 +96,3 @@ class Favorite(BaseModel):
     user: UserBaseSchema
     recipe_id: int
     recipe: RecipeBaseSchema
-
-
-class UserSchema(UserBaseSchema):
-    recipes: list[RecipeBaseSchema]
-
-
-class TagSchema(BaseTagSchema):
-    recipes: RecipeBaseSchema
-
-
-class IngredientSchema(BaseIngredientSchema):
-    recipes: RecipeBaseSchema
