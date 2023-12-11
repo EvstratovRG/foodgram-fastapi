@@ -28,8 +28,7 @@ class TagId(BaseModel):
     id: int
 
 
-class BaseIngredientSchema(BaseModel):
-    id: int
+class BaseIngredientSchema(BaseORMSchema):
     name: str_200
     measurement_unit: str_200
 
@@ -43,8 +42,7 @@ class CreateIngredientSchema(BaseModel):
     measurement_unit: str_200
 
 
-class BaseTagSchema(BaseModel):
-    id: int
+class BaseTagSchema(BaseORMSchema):
     name: str_200
     slug: str_200
     color: str
@@ -57,7 +55,7 @@ class CreateTagSchema(BaseModel):
 
 
 class RecipeBaseSchema(BaseORMSchema):
-    name: str_50
+    name: str_200
     text: str
     cooking_time: int
     image: str
@@ -72,7 +70,7 @@ class CreateRecipeSchema(BaseModel):
     name: str_50
     text: str
     cooking_time: int
-    image: str
+    image_incoded_base64: str = Field(alias='image')
     tags: list[int]
     ingredients: list[IngredientAmount]
 

@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from typing import Any
+# from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.users.models import User
 from src.api.dependencies.auth import get_current_user
 from src.api.exceptions import users as user_exceptions
@@ -8,7 +10,7 @@ from src.schemas import users as user_schemas
 from src.schemas import base as base_schemas
 from src.hasher import Hasher
 
-from config.db import get_async_session, AsyncSession
+from config.db import get_async_session
 
 
 router = APIRouter(prefix="/users", tags=["/users"])

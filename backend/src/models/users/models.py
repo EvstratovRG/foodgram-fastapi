@@ -57,25 +57,25 @@ class User(TimeMixin, Base):
         Boolean, default=False, nullable=False
     )
     recipe: Mapped[list['Recipe']] = relationship(uselist=True)
-    follower = relationship(
+    follower: Mapped['Follow'] = relationship(
         'Follow',
         foreign_keys=[Follow.follower_id],
         back_populates='follower',
-        lazy='joined',
+        lazy='selectin',
     )
-    following = relationship(
+    following: Mapped['Follow'] = relationship(
         'Follow',
         foreign_keys=[Follow.following_id],
         back_populates='following',
         lazy='joined',
     )
-    buyer = relationship(
+    buyer: Mapped['PurchaseCart'] = relationship(
         'PurchaseCart',
         foreign_keys=[PurchaseCart.user_id],
         back_populates='buyer',
         lazy='joined',
     )
-    favor_user = relationship(
+    favor_user: Mapped['Favorite'] = relationship(
         'Favorite',
         foreign_keys=[Favorite.user_id],
         back_populates='favor_user',

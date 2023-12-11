@@ -1,13 +1,14 @@
 from fastapi import HTTPException, status
 from src.schemas import users as users_schema
 from src.models.users.models import User
-from sqlalchemy import select
-# from sqlalchemy.orm import selectinload, outerjoin
+from sqlalchemy import select, insert
+from sqlalchemy.orm import selectinload
 # from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError
 from src.hasher import Hasher
 
 from typing import TYPE_CHECKING, Sequence
+
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -47,29 +48,6 @@ async def get_user(
         select(User).select_from(User).where(User.id == user_id))
     result = await session.scalars(stmt)
     return result.unique().first()
-    # ).options(
-    #         joinedload(User.recipe).joinedload(User.following)
-    #     )
-
-
-# async def get_user_with_relationships(
-#         session: 'AsyncSession',
-#         user_id: int
-#         ) -> User | None:
-#     """Получить пользователя по id
-#     из базы данных с загруженными отношениями."""
-#     stmt = (
-#         select(User)
-#         .options(selectinload(User.follower), selectinload(User.following))
-#         .where(User.id == user_id)
-#     )
-#     result = await session.scalars(stmt)
-#     with_subscribed = any(
-#         follow.following_id == result.id
-#         for follow in stmt.follower
-#     )
-
-#     return with_subscribed.unique().first()
 
 
 async def get_users(session: 'AsyncSession') -> Sequence[User]:
@@ -84,16 +62,17 @@ async def create_user(
         user_schema: users_schema.CreateUserSchema
         ) -> User:
     """Создать пользователя в базе данных."""
-    user = User(
+    stmt = insert(User).values(
         username=user_schema.username,
         first_name=user_schema.first_name,
         last_name=user_schema.last_name,
         email=user_schema.email,
         hashed_password=Hasher.get_password_hash(user_schema.password)
-    )
+    ).returning(User).options(selectinload(User.follower))
     try:
-        session.add(user)
-        await session.commit()
+        user = await session.scalar(stmt)
+        if not user:
+            raise IntegrityError('Пользователь не создан')
     except IntegrityError as exc:
         await session.rollback()
         raise HTTPException(

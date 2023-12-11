@@ -55,10 +55,12 @@ async def create_recipe(
     session: AsyncSession = Depends(get_async_session),
     author: User = Depends(get_me),
 ) -> Any:
-    created_recipe = await recipe_queries.create_recipe(
-        session=session,
-        recipe_schema=recipe_schema,
-        author=author
+    created_recipe: recipe_schemas.RecipeBaseSchema = (
+        await recipe_queries.create_recipe(
+            session=session,
+            recipe_schema=recipe_schema,
+            author=author,
+        ),
     )
     return created_recipe
 

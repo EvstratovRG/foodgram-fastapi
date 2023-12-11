@@ -1,16 +1,25 @@
 from src.models.users.models import User
 from src.schemas import recipes as recipes_schema
-from src.models.recipes.models import Recipe, RecipeIngredient, RecipeTag, Ingredient, Tag
+from src.models.recipes.models import (
+    Recipe,
+    RecipeIngredient,
+    RecipeTag,
+)
+from sqlalchemy import insert, select
+from sqlalchemy.orm import selectinload
 from src.queries.ingredients import get_ingredient
 from src.queries.tags import get_tag
-from sqlalchemy import select
-# from sqlalchemy.orm import joinedload
+# from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from fastapi.exceptions import HTTPException
+from fastapi import status
 from sqlalchemy.exc import SQLAlchemyError
+from src.api.base64_decoder import base64_decoder
 
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
-    from config.db import AsyncSession
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def get_recipe(
@@ -32,18 +41,53 @@ async def get_recipes(
 
 async def create_through_entities(
         recipe: int,
-        data: recipes_schema.RecipeIngredientSchema,
+        many_to_many_data: recipes_schema.IngredientAmount | list[int],
         model: RecipeIngredient | RecipeTag,
-        method: Ingredient | Tag | None,
         session: 'AsyncSession'
         ) -> RecipeIngredient | RecipeTag:
-    for elem in data:
-        entity: int = method(elem.id)
-        if model is RecipeIngredient:
-            through = model(recipe, entity, data.amount)
-        through = model(recipe, entity)
-        result = await session.add(through)
-    return result
+    """Создание many-to-many сущностей."""
+    # тут можно сделать булк, сущностей может быть много
+    if model is RecipeIngredient:
+        list_ingredients = []
+        amounts = []
+        for elem in many_to_many_data:
+            data = dict(elem)
+            through = model(
+                recipe_id=recipe,
+                ingredient_id=data.get('id'),
+                amount=data.get('amount')
+            )
+            session.add(through)
+            list_ingredients.append(
+                await get_ingredient(
+                    session,
+                    data.get('id'),
+                ),
+            )
+            amounts.append(data.get('amount'))
+        validate_list_ingredients = [
+            recipes_schema.IngredientThroughSchema(
+                amount=amount,
+                id=ingredient.id,
+                name=ingredient.name,
+                measurement_unit=ingredient.measurement_unit
+            )
+            for ingredient, amount in zip(list_ingredients, amounts)]
+        return validate_list_ingredients
+    else:
+        list_tags = []
+        for elem in many_to_many_data:
+            through = model(
+                recipe_id=recipe,
+                tag_id=elem
+            )
+            session.add(through)
+            list_tags.append(await get_tag(session, elem))
+        validated_tags = [
+            recipes_schema.BaseTagSchema.model_validate(tag)
+            for tag in list_tags
+        ]
+        return validated_tags
 
 
 async def create_recipe_entity(
@@ -51,15 +95,27 @@ async def create_recipe_entity(
         author: User,
         session: 'AsyncSession'
         ) -> Recipe:
-    recipe = Recipe(
+    """Создание рецепта."""
+    stmt = insert(Recipe).values(
         name=recipe_data.name,
         text=recipe_data.text,
         cooking_time=recipe_data.cooking_time,
-        image=recipe_data.image,
+        image=base64_decoder(recipe_data.image_incoded_base64),
         author=author
-    )
-    result = await session.add(recipe)
-    await session.flush()
+    ).returning(Recipe).options(
+        selectinload(Recipe.cart_recipe),
+        selectinload(Recipe.favor_recipe))
+    try:
+        result = await session.scalar(stmt)
+        if not result:
+            raise IntegrityError('Рецепт не создан')
+        await session.flush()
+    except IntegrityError as exc:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc.orig),
+        )
     return result
 
 
@@ -68,25 +124,36 @@ async def create_recipe(
         recipe_schema: recipes_schema.CreateRecipeSchema,
         author: User,
         ) -> Recipe:
+    """Создание рецепта со связанными сущностями."""
     recipe = await create_recipe_entity(recipe_schema, author, session)
     if recipe_schema.ingredients:
-        await create_through_entities(
-            recipe.id,
-            recipe_schema.ingredients,
-            RecipeIngredient,
-            get_ingredient,
-            session
+        list_ingredients = await create_through_entities(
+            recipe=recipe.id,
+            many_to_many_data=recipe_schema.ingredients,
+            model=RecipeIngredient,
+            session=session
         )
+    print(f'\n\n\n{list_ingredients}\n\n\n')
     if recipe_schema.tags:
-        await create_through_entities(
-            recipe.id,
-            recipe_schema.tags,
-            RecipeTag,
-            get_tag,
-            session
+        list_tags = await create_through_entities(
+            recipe=recipe.id,
+            many_to_many_data=recipe_schema.tags,
+            model=RecipeTag,
+            session=session
         )
     await session.commit()
-    return recipe
+    return recipes_schema.RecipeBaseSchema(
+        id=recipe.id,
+        name=recipe.name,
+        text=recipe.text,
+        cooking_time=recipe.cooking_time,
+        image=recipe.image,
+        author=author,
+        tags=list_tags,
+        ingredients=list_ingredients,
+        is_favorited=recipe.is_favorited,
+        is_in_shopping_cart=recipe.is_in_shopping_cart
+        )
 
 
 async def update_recipe(
@@ -94,6 +161,7 @@ async def update_recipe(
         recipe_id: int,
         recipe_schema: recipes_schema.RecipeBaseSchema
         ) -> Recipe | None:
+    """Обновление рецепта."""
     recipe = await get_recipe(session, recipe_id)
     if recipe is None:
         return None
@@ -109,6 +177,7 @@ async def delete_recipe(
         session: 'AsyncSession',
         recipe_id: int
         ) -> bool | None:
+    """Удаление рецепта."""
     recipe = await get_recipe(session, recipe_id)
     if recipe is None:
         return None

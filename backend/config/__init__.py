@@ -24,3 +24,5 @@ def get_db_config() -> DatabaseSettings:
 app_config = get_app_config()
 site_config = get_site_config()
 db_config = get_db_config()
+
+media_root: str = base_dir + app_config.media

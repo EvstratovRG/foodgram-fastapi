@@ -6,10 +6,8 @@ from sqlalchemy import (
     UniqueConstraint
 )
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy_file import ImageField
 from src.models.base import Base, TimeMixin, str_200
 from typing import Annotated, TYPE_CHECKING, Self
-from sqlalchemy.sql.sqltypes import JSON
 from sqlalchemy.orm import validates
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -193,11 +191,7 @@ class Recipe(TimeMixin, Base):
     name: Mapped[str] = mapped_column(String(50), index=True)
     text: Mapped[str | None] = mapped_column(Text, default=None)
     cooking_time: Mapped[int] = mapped_column(Integer, default=1)
-    image: Mapped[JSON | None] = mapped_column(
-        ImageField(
-            upload_storage='/backend/media'
-        ),
-    )
+    image: Mapped[str | None] = mapped_column(String())
     author_id: Mapped[int] = mapped_column(
         ForeignKey(
             "user.id",
@@ -219,17 +213,17 @@ class Recipe(TimeMixin, Base):
         secondary='recipe_ingredient',
         back_populates='recipe',
     )
-    cart_recipe = relationship(
+    cart_recipe: Mapped['PurchaseCart'] = relationship(
         'PurchaseCart',
         foreign_keys=[PurchaseCart.recipe_id],
         back_populates='cart_recipe',
-        lazy='joined',
+        lazy='selectin',
     )
-    favor_recipe = relationship(
+    favor_recipe: Mapped['Favorite'] = relationship(
         'Favorite',
         foreign_keys=[Favorite.recipe_id],
         back_populates='favor_recipe',
-        lazy='joined',
+        lazy='selectin',
     )
 
     @hybrid_property

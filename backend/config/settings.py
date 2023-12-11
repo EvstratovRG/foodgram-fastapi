@@ -29,6 +29,7 @@ class ApplicationSettings(BaseSettings):
     secret: str
     token_expire: int
     algorithm: str
+    media: str
 
 
 class DatabaseSettings(BaseSettings):
