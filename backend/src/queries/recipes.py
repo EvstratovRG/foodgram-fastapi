@@ -101,10 +101,11 @@ async def create_recipe_entity(
         text=recipe_data.text,
         cooking_time=recipe_data.cooking_time,
         image=base64_decoder(recipe_data.image_incoded_base64),
-        author=author
-    ).returning(Recipe).options(
-        selectinload(Recipe.cart_recipe),
-        selectinload(Recipe.favor_recipe))
+        author_id=author.id,
+        ).returning(Recipe).options(
+            selectinload(Recipe.cart_recipe),
+            selectinload(Recipe.favor_recipe),
+        )
     try:
         result = await session.scalar(stmt)
         if not result:
@@ -133,7 +134,6 @@ async def create_recipe(
             model=RecipeIngredient,
             session=session
         )
-    print(f'\n\n\n{list_ingredients}\n\n\n')
     if recipe_schema.tags:
         list_tags = await create_through_entities(
             recipe=recipe.id,
