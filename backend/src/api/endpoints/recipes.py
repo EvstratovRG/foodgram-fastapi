@@ -72,11 +72,13 @@ async def create_recipe(
 async def update_recipe(
     recipe_id: int,
     recipe_schema: recipe_schemas.RecipeBaseSchema,
+    author: User = Depends(get_me),
     session: AsyncSession = Depends(get_async_session),
 ) -> Any:
     updated_recipe = await recipe_queries.update_recipe(
         session=session,
         recipe_id=recipe_id,
+        author=author,
         recipe_schema=recipe_schema
     )
     if not updated_recipe:

@@ -16,11 +16,6 @@ async def get_tag(
         session: 'AsyncSession',
         tag_id: int
         ) -> Tag | None:
-    # stmt = (
-    #     select(Tag).select_from(Tag).where(Tag.id == tag_id).options(
-    #         joinedload(Tag.recipes),
-    #     ),
-    # )
     stmt = select(Tag).where(Tag.id == tag_id)
     result = await session.scalars(stmt)
     return result.first()

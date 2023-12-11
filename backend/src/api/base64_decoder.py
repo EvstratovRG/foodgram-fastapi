@@ -1,6 +1,7 @@
 import base64
 from config import media_root
 from src.api.exceptions.recipes import ImageLoadException
+from datetime import datetime
 
 
 def base64_decoder(data: str) -> str | None:
@@ -9,8 +10,7 @@ def base64_decoder(data: str) -> str | None:
             format, imgstr = data.split(';base64,')
             ext = format.split('/')[-1]
             image_binary: bytes = base64.b64decode(imgstr)
-            name: str = base64.urlsafe_b64encode(image_binary).decode("utf-8")
-            filename = f"{name[0:10]}.{ext}"
+            filename = f"{datetime.now()}.{ext}"
             file_path = media_root + filename
             with open(file_path, "wb") as file:
                 file.write(image_binary)
