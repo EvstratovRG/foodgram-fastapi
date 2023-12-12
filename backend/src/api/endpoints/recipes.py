@@ -51,27 +51,26 @@ async def get_recipes(
 )
 async def create_recipe(
     recipe_schema: recipe_schemas.CreateRecipeSchema,
-    session: AsyncSession = Depends(get_async_session),
     author: User = Depends(get_me),
+    session: AsyncSession = Depends(get_async_session),
 ) -> Any:
     created_recipe: recipe_schemas.RecipeBaseSchema = (
         await recipe_queries.create_recipe(
             session=session,
             recipe_schema=recipe_schema,
             author=author,
-        ),
+        )
     )
     return created_recipe
 
 
-@router.put(
+@router.patch(
     "/{recipe_id}",
     status_code=status.HTTP_200_OK,
-    response_model=recipe_schemas.RecipeBaseSchema
 )
 async def update_recipe(
     recipe_id: int,
-    recipe_schema: recipe_schemas.RecipeBaseSchema,
+    recipe_schema: recipe_schemas.UpdateRecipeSchema,
     author: User = Depends(get_me),
     session: AsyncSession = Depends(get_async_session),
 ) -> Any:

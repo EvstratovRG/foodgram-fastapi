@@ -40,9 +40,9 @@ async def get_recipes(
 
 async def create_or_update_through_entities(
         recipe: int,
+        method,
         many_to_many_data: recipes_schema.IngredientAmount | list[int],
         model: RecipeIngredient | RecipeTag,
-        method,
         session: 'AsyncSession'
         ) -> RecipeIngredient | RecipeTag:
     """Создание many-to-many сущностей."""
@@ -57,7 +57,7 @@ async def create_or_update_through_entities(
                 ingredient_id=data.get('id'),
                 amount=data.get('amount')
             )
-            session.add(through)
+            await session.execute(through)
             list_ingredients.append(
                 await get_ingredient(
                     session,
@@ -81,7 +81,7 @@ async def create_or_update_through_entities(
                 recipe_id=recipe,
                 tag_id=elem
             )
-            session.add(through)  # нужно ли делать, если инсерт?
+            await session.execute(through)  # нужно ли делать, если инсерт?
             list_tags.append(await get_tag(session, elem))
         validated_tags = [
             recipes_schema.BaseTagSchema.model_validate(tag)
@@ -130,17 +130,17 @@ async def create_recipe(
     if recipe_schema.ingredients:
         list_ingredients = await create_or_update_through_entities(
             recipe=recipe.id,
+            method=insert,
             many_to_many_data=recipe_schema.ingredients,
             model=RecipeIngredient,
-            method=insert,
             session=session
         )
     if recipe_schema.tags:
         list_tags = await create_or_update_through_entities(
             recipe=recipe.id,
+            method=insert,
             many_to_many_data=recipe_schema.tags,
             model=RecipeTag,
-            method=insert,
             session=session
         )
     await session.commit()

@@ -75,6 +75,10 @@ class CreateRecipeSchema(BaseModel):
     ingredients: list[IngredientAmount]
 
 
+class UpdateRecipeSchema(CreateRecipeSchema):
+    pass
+
+
 class Follow(BaseModel):
     user_id: int
     user: UserBaseSchema

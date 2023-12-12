@@ -1,6 +1,5 @@
 from src.models.recipes.models import Tag
 from sqlalchemy import select
-# from sqlalchemy.orm import joinedload
 from src.schemas.recipes import CreateTagSchema
 from sqlalchemy.exc import IntegrityError
 from fastapi.exceptions import HTTPException
