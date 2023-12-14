@@ -5,7 +5,8 @@ from src.models.recipes.models import (
     RecipeIngredient,
     RecipeTag,
 )
-from sqlalchemy import insert, select, update
+from sqlalchemy import select, insert
+from sqlalchemy.dialects.postgresql import insert as upsert
 from sqlalchemy.orm import selectinload
 from src.queries.ingredients import get_ingredient
 from src.queries.tags import get_tag
@@ -38,33 +39,83 @@ async def get_recipes(
     return result.all()
 
 
-async def create_or_update_through_entities(
+async def create_recipe_ingredient_entities(
         recipe: int,
-        method,
-        many_to_many_data: recipes_schema.IngredientAmount | list[int],
-        model: RecipeIngredient | RecipeTag,
+        many_to_many_data: recipes_schema.IngredientAmount,
         session: 'AsyncSession'
-        ) -> RecipeIngredient | RecipeTag:
-    """Создание many-to-many сущностей."""
-    # тут можно сделать булк, сущностей может быть много
-    if model is RecipeIngredient:
-        list_ingredients = []
-        amounts = []
-        for elem in many_to_many_data:
-            data = dict(elem)
-            through = method(model).values(
+) -> recipes_schema.IngredientThroughSchema:
+    """Создать RecipeIngredient."""
+    ingredients = []
+    amounts = []
+    for elem in many_to_many_data:
+        data = dict(elem)
+        stmt = insert(RecipeIngredient).values(
+            recipe_id=recipe,
+            ingredient_id=data.get('id'),
+            amount=data.get('amount')
+        )
+        await session.execute(stmt)
+        ingredients.append(
+            await get_ingredient(session, data.get('id')),
+        )
+        amounts.append(data.get('amount'))
+    validate_list_ingredients = [
+        recipes_schema.IngredientThroughSchema(
+            amount=amount,
+            id=ingredient.id,
+            name=ingredient.name,
+            measurement_unit=ingredient.measurement_unit
+        )
+        for ingredient, amount in zip(ingredients, amounts)]
+    return validate_list_ingredients
+
+
+async def create_recipe_tag_entities(
+        recipe: int,
+        many_to_many_data: list[int],
+        session: 'AsyncSession'
+) -> recipes_schema.BaseTagSchema:
+    """Создать RecipeTag."""
+    tags = []
+    for elem in many_to_many_data:
+        through = insert(RecipeTag).values(
+            recipe_id=recipe,
+            tag_id=elem
+        )
+        await session.execute(through)
+        tags.append(
+            await get_tag(session, elem)
+        )
+    validated_tags = [
+        recipes_schema.BaseTagSchema.model_validate(tag)
+        for tag in tags
+    ]
+    return validated_tags
+
+
+async def update_recipe_ingredient_entities(
+        recipe: int,
+        many_to_many_data: recipes_schema.IngredientAmount,
+        session: 'AsyncSession'
+) -> recipes_schema.IngredientThroughSchema:
+    """Обновить RecipeIngredient."""
+    ingredients = []
+    amounts = []
+    for elem in many_to_many_data:
+        data = dict(elem)
+        stmt = upsert(
+            RecipeIngredient
+            ).values(
                 recipe_id=recipe,
                 ingredient_id=data.get('id'),
                 amount=data.get('amount')
             )
-            await session.execute(through)
-            list_ingredients.append(
-                await get_ingredient(
-                    session,
-                    data.get('id'),
-                ),
-            )
-            amounts.append(data.get('amount'))
+        query = stmt.on_conflict_do_nothing()
+        await session.execute(query)
+        ingredients.append(
+            await get_ingredient(session, data.get('id'))
+        )
+        amounts.append(data.get('amount'))
         validate_list_ingredients = [
             recipes_schema.IngredientThroughSchema(
                 amount=amount,
@@ -72,22 +123,34 @@ async def create_or_update_through_entities(
                 name=ingredient.name,
                 measurement_unit=ingredient.measurement_unit
             )
-            for ingredient, amount in zip(list_ingredients, amounts)]
+            for ingredient, amount in zip(ingredients, amounts)]
         return validate_list_ingredients
-    else:
-        list_tags = []
-        for elem in many_to_many_data:
-            through = method(model).values(
+
+
+async def update_recipe_tag_entities(
+        recipe: int,
+        many_to_many_data: list[int],
+        session: 'AsyncSession'
+) -> recipes_schema.IngredientAmount:
+    """Обновить RecipeIngredient."""
+    tags = []
+    for elem in many_to_many_data:
+        stmt = upsert(
+            RecipeTag
+            ).values(
                 recipe_id=recipe,
                 tag_id=elem
             )
-            await session.execute(through)  # нужно ли делать, если инсерт?
-            list_tags.append(await get_tag(session, elem))
-        validated_tags = [
-            recipes_schema.BaseTagSchema.model_validate(tag)
-            for tag in list_tags
-        ]
-        return validated_tags
+        query = stmt.on_conflict_do_nothing()
+        await session.execute(query)
+        tags.append(
+            await get_tag(session, elem)
+        )
+    validated_tags = [
+        recipes_schema.BaseTagSchema.model_validate(tag)
+        for tag in tags
+    ]
+    return validated_tags
 
 
 async def create_recipe_entity(
@@ -128,19 +191,15 @@ async def create_recipe(
     """Создание рецепта со связанными сущностями."""
     recipe = await create_recipe_entity(recipe_schema, author, session)
     if recipe_schema.ingredients:
-        list_ingredients = await create_or_update_through_entities(
+        list_ingredients = await create_recipe_ingredient_entities(
             recipe=recipe.id,
-            method=insert,
             many_to_many_data=recipe_schema.ingredients,
-            model=RecipeIngredient,
             session=session
         )
     if recipe_schema.tags:
-        list_tags = await create_or_update_through_entities(
+        list_tags = await create_recipe_tag_entities(
             recipe=recipe.id,
-            method=insert,
             many_to_many_data=recipe_schema.tags,
-            model=RecipeTag,
             session=session
         )
     await session.commit()
@@ -158,13 +217,11 @@ async def create_recipe(
     )
 
 
-async def update_recipe(
+async def update_recipe_entity(
         session: 'AsyncSession',
         recipe_id: int,
-        author: User,
         recipe_schema: recipes_schema.CreateRecipeSchema
-        ) -> recipes_schema.RecipeBaseSchema | None:
-    """Обновление рецепта."""
+) -> Recipe:
     recipe = await get_recipe(session, recipe_id)
     if recipe is None:
         return None
@@ -172,21 +229,28 @@ async def update_recipe(
     recipe.text = recipe_schema.text
     recipe.name = recipe_schema.name
     recipe.image = base64_decoder(recipe_schema.image_incoded_base64)
-    recipe_tags = await create_or_update_through_entities(
-        recipe=recipe_id,
-        many_to_many_data=recipe_schema.tags,
-        model=RecipeTag,
-        method=update,
-        session=session
+    return recipe
+
+
+async def update_recipe(
+        session: 'AsyncSession',
+        recipe_id: int,
+        author: User,
+        recipe_schema: recipes_schema.CreateRecipeSchema
+        ) -> recipes_schema.RecipeBaseSchema | None:
+    """Обновление рецепта и его связанных атрибутов."""
+    recipe = await update_recipe_entity(session, recipe_id, recipe_schema)
+    recipe_tags = await update_recipe_tag_entities(
+        recipe.id,
+        recipe_schema.tags,
+        session
     )
-    recipe_ingredients = await create_or_update_through_entities(
-        recipe=recipe_id,
-        many_to_many_data=recipe_schema.ingredients,
-        model=RecipeIngredient,
-        method=update,
-        session=session
+    recipe_ingredients = await update_recipe_ingredient_entities(
+        recipe.id,
+        recipe_schema.ingredients,
+        session
     )
-    await recipe.commit()
+    await session.commit()
     return recipes_schema.RecipeBaseSchema(
         id=recipe_id,
         name=recipe.name,

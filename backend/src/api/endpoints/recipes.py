@@ -64,7 +64,7 @@ async def create_recipe(
     return created_recipe
 
 
-@router.patch(
+@router.put(
     "/{recipe_id}",
     status_code=status.HTTP_200_OK,
 )

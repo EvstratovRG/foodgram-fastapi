@@ -20,6 +20,7 @@ intpk = Annotated[int, mapped_column(primary_key=True)]
 
 
 class RecipeIngredient(TimeMixin, Base):
+    """Сквозная модель Рецепта и Ингредиентов для хранения many-to-many связи."""
     __tablename__ = 'recipe_ingredient'
 
     recipe_id: Mapped[int] = mapped_column(
@@ -34,6 +35,7 @@ class RecipeIngredient(TimeMixin, Base):
 
 
 class RecipeTag(TimeMixin, Base):
+    """Сквозная модель Рецепта и Тегов для хранения many-to-many связи."""
     __tablename__ = 'recipe_tag'
 
     recipe_id: Mapped[int] = mapped_column(
@@ -47,6 +49,7 @@ class RecipeTag(TimeMixin, Base):
 
 
 class Ingredient(TimeMixin, Base):
+    """Модель данных хранения Ингредиентов."""
     __tablename__ = "ingredient"
 
     id: Mapped[intpk] = mapped_column(autoincrement=True)
@@ -60,6 +63,7 @@ class Ingredient(TimeMixin, Base):
 
 
 class Tag(TimeMixin, Base):
+    """Модель данных храненения Тэгов."""
     __tablename__ = "tag"
 
     id: Mapped[intpk] = mapped_column(autoincrement=True)
@@ -74,6 +78,7 @@ class Tag(TimeMixin, Base):
 
 
 class Follow(TimeMixin, Base):
+    """Модель данных хранения связей - Подписок пользователей."""
     __tablename__ = "follow"
     __table_args__ = (
         UniqueConstraint(
@@ -117,6 +122,7 @@ class Follow(TimeMixin, Base):
 
 
 class PurchaseCart(TimeMixin, Base):
+    """Модель хранения данных о Корзине товаров пользователя."""
     __tablename__ = "purchase_cart"
     __table_args__ = (
         UniqueConstraint(
@@ -151,6 +157,7 @@ class PurchaseCart(TimeMixin, Base):
 
 
 class Favorite(TimeMixin, Base):
+    """Модель данных хранения Избранных рецептов пользователя."""
     __tablename__ = "favorite"
     __table_args__ = (
         UniqueConstraint(
@@ -185,6 +192,7 @@ class Favorite(TimeMixin, Base):
 
 
 class Recipe(TimeMixin, Base):
+    """Модель данных хранения Рецептов."""
     __tablename__ = "recipe"
 
     id: Mapped[intpk] = mapped_column(autoincrement=True, index=True)
