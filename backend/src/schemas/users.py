@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, EmailStr
 from typing import Annotated
-from .base import BaseORMSchema
+from src.schemas.base import BaseORMSchema
+
 
 str_150 = Annotated[str, StringConstraints(max_length=150)]
 email_150 = Annotated[EmailStr, StringConstraints(max_length=150)]
@@ -29,3 +30,13 @@ class CreateUserSchema(BaseModel):
 class ChangeUserPassword(BaseModel):
     new_password: str_150
     current_password: str_150
+
+
+class GetSubscriptions(UserBaseSchema):
+    recipes: list['Subcriptions']
+    recipes_count: int
+
+
+from src.schemas.recipes import Subcriptions
+
+GetSubscriptions.model_rebuild()

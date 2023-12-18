@@ -208,7 +208,7 @@ class Recipe(TimeMixin, Base):
     )
     author: Mapped['User'] = relationship(
         'User',
-        back_populates='recipe',
+        back_populates='recipes',
     )
     tag: Mapped[list["Tag"]] = relationship(
         uselist=True,

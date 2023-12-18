@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, status
 from typing import Any
-# from sqlalchemy.orm import joinedload, selectinload
-from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.users.models import User
 from src.api.dependencies.auth import get_current_user
 from src.api.exceptions import users as user_exceptions
@@ -9,9 +7,9 @@ from src.queries import users as user_queries
 from src.schemas import users as user_schemas
 from src.schemas import base as base_schemas
 from src.hasher import Hasher
-
 from config.db import get_async_session
 
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/users", tags=["/users"])
 
@@ -21,7 +19,8 @@ router = APIRouter(prefix="/users", tags=["/users"])
     status_code=status.HTTP_200_OK,
     response_model=(
         list[user_schemas.UserBaseSchema] |
-        base_schemas.ExceptionSchema)
+        base_schemas.ExceptionSchema
+    )
 )
 async def get_users(
     session: AsyncSession = Depends(get_async_session),
@@ -77,19 +76,19 @@ async def get_me(
 )
 async def change_users_password(
     user_schema: user_schemas.ChangeUserPassword,
-    user: User = Depends(get_me),
+    current_user: User = Depends(get_me),
     session: AsyncSession = Depends(get_async_session),
 ) -> Any:
     """Изменить пароль текущего пользователя."""
     validate_current_password = Hasher.verify_password(
         user_schema.current_password,
-        user.hashed_password
+        current_user.hashed_password
     )
     if not validate_current_password:
         raise user_exceptions.WrongPassword
     changed_password = await user_queries.update_password(
         session=session,
-        user_id=user.id,
+        user_id=current_user.id,
         current_password=Hasher.get_password_hash(
             user_schema.new_password
         )

@@ -6,8 +6,9 @@ from src.queries import recipes as recipe_queries
 from src.schemas import recipes as recipe_schemas
 from src.schemas import base as base_schemas
 from src.api.exceptions.recipes import RecipeNotFoundException
-from config.db import get_async_session, AsyncSession
+from config.db import get_async_session
 
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/recipes", tags=["/recipes"])
 

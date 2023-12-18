@@ -8,7 +8,7 @@ from fastapi import status
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
-    from config.db import AsyncSession
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def get_ingredient(

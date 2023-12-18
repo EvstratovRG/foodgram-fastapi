@@ -3,8 +3,9 @@ from typing import Any
 
 from src.queries import tags as tag_queries
 from src.schemas import recipes as tag_schemas
-from config.db import get_async_session, AsyncSession
+from config.db import get_async_session
 
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/tags", tags=["/tags"])
 

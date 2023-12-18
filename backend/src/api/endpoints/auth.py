@@ -9,12 +9,14 @@ from src.auth.authorization import (
     create_token,
 )
 from src.schemas import base as base_schemas
-from config.db import get_async_session, AsyncSession
+from config.db import get_async_session
 from src.api.exceptions.users import SomethingGoesWrong, WrongСredentials
 from config import app_config
 from typing import Any
 from src.api.dependencies.auth import get_current_user
 from src.models.users.models import User
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/auth/token", tags=["/auth/token"])
 
