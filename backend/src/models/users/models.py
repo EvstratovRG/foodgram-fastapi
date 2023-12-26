@@ -56,7 +56,10 @@ class User(TimeMixin, Base):
     is_verified: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False
     )
-    recipes: Mapped[list['Recipe']] = relationship(uselist=True)
+    recipes: Mapped[list['Recipe']] = relationship(
+        uselist=True,
+        lazy='joined',
+    )
     follower: Mapped['Follow'] = relationship(
         'Follow',
         foreign_keys=[Follow.follower_id],

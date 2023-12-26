@@ -16,7 +16,10 @@ router = APIRouter(prefix="/users", tags=["/users"])
 @router.get(
     "/subscriptions/",
     status_code=status.HTTP_200_OK,
-    response_model=list[user_schemas.GetSubscriptions]
+    response_model=(
+        list[user_schemas.GetSubscriptions] |
+        base_schemas.ExceptionSchema
+    )
 )
 async def get_my_subscriptions(
     current_user: User = Depends(get_me),
@@ -35,7 +38,7 @@ async def get_my_subscriptions(
     "/{user_id}/subscribe/",
     status_code=status.HTTP_201_CREATED,
     response_model=(
-        list[user_schemas.GetSubscriptions] |
+        user_schemas.GetSubscriptions |
         base_schemas.ExceptionSchema
     )
 )
@@ -52,3 +55,22 @@ async def subscribe(
     if subsribe is None:
         raise user_exceptions.SomethingGoesWrong
     return subsribe
+
+
+@router.delete(
+    "/{user_id}/subscribe/",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def unsubscribe(
+    user_id: int,
+    current_user: User = Depends(get_me),
+    session: AsyncSession = Depends(get_async_session)
+) -> None:
+    subsribe = await follow_queries.unsubsribe(
+        current_user_id=current_user.id,
+        user_id=user_id,
+        session=session
+    )
+    if not subsribe:
+        raise user_exceptions.UserNotFoundException
+    return None

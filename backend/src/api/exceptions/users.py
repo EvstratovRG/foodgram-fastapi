@@ -22,3 +22,7 @@ WrongPassword = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
     detail='Не верно введен пароль'
 )
+BadSubscribe = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST,
+    detail='Нельзя подписаться на самого себя!'
+)
