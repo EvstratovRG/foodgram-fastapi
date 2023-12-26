@@ -8,6 +8,7 @@ def get_routers() -> list[APIRouter]:
     from src.api.endpoints.recipes import router as recipe_router
     from src.api.endpoints.follows import router as follow_router
     from src.api.endpoints.auth import router as auth_router
+    from src.api.endpoints.favorites import router as favorite_router
 
     routers: list[APIRouter] = list()
 
@@ -17,4 +18,5 @@ def get_routers() -> list[APIRouter]:
     routers.append(tags_touter)
     routers.append(recipe_router)
     routers.append(auth_router)
+    routers.append(favorite_router)
     return routers

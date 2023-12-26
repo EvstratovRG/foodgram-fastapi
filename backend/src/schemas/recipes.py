@@ -86,11 +86,11 @@ class PurchaseCart(BaseModel):
     recipe: RecipeBaseSchema
 
 
-class Favorite(BaseModel):
-    user_id: int
-    user: UserBaseSchema
-    recipe_id: int
-    recipe: RecipeBaseSchema
+class FavoriteRecipeSchema(BaseModel):
+    id: int
+    name: str
+    image: str
+    cooking_time: int
 
 
 class Subcriptions(BaseORMSchema):
