@@ -85,3 +85,7 @@ class User(TimeMixin, Base):
     @hybrid_property
     def is_subscribed(self: Self) -> bool:
         return bool(self.follower)
+
+    @hybrid_property
+    def recipes_count(self: Self) -> int:
+        return len(self.recipes)

@@ -20,7 +20,8 @@ intpk = Annotated[int, mapped_column(primary_key=True)]
 
 
 class RecipeIngredient(TimeMixin, Base):
-    """Сквозная модель Рецепта и Ингредиентов для хранения many-to-many связи."""
+    """Сквозная модель Рецепта и Ингредиентов
+    для хранения many-to-many связи."""
     __tablename__ = 'recipe_ingredient'
 
     recipe_id: Mapped[int] = mapped_column(
