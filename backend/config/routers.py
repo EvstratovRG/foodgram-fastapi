@@ -13,6 +13,7 @@ def get_routers() -> list[APIRouter]:
 
     routers: list[APIRouter] = list()
 
+    routers.append(cart_router)
     routers.append(ingredients_router)
     routers.append(follow_router)
     routers.append(users_router)
@@ -20,5 +21,4 @@ def get_routers() -> list[APIRouter]:
     routers.append(recipe_router)
     routers.append(auth_router)
     routers.append(favorite_router)
-    routers.append(cart_router)
     return routers

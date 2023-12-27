@@ -17,13 +17,14 @@ router = APIRouter(prefix="/recipes", tags=["/recipes"])
 @router.get(
     "/download_shopping_cart/",
     status_code=status.HTTP_200_OK,
+    response_model=list[recipe_schemas.PurchaseCartIngredients]
 )
 async def download_shopping_cart(
     current_user: User = Depends(get_me),
     session: AsyncSession = Depends(get_async_session)
 ) -> Any:
     shopping_cart = await cart_queries.shopping_cart(
-        current_user_id=current_user.id,
+        user_id=current_user.id,
         session=session
     )
     if shopping_cart is None:

@@ -33,6 +33,12 @@ class BaseIngredientSchema(BaseORMSchema):
     measurement_unit: str_200
 
 
+class PurchaseCartIngredients(BaseModel):
+    name: str
+    measurement_unit: str
+    amount: int
+
+
 class IngredientThroughSchema(BaseIngredientSchema):
     amount: int
 

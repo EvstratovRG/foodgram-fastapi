@@ -1,11 +1,16 @@
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, func
 from typing import TYPE_CHECKING
 from sqlalchemy.exc import IntegrityError
 from fastapi.exceptions import HTTPException
 from fastapi import status
 from src.queries import recipes as recipe_queries
-from src.models.recipes.models import Recipe
-from src.models.recipes.models import Ingredient, PurchaseCart
+from src.models.users.models import User
+from src.models.recipes.models import (
+    Ingredient,
+    PurchaseCart,
+    RecipeIngredient,
+    Recipe,
+)
 from sqlalchemy.exc import SQLAlchemyError
 
 if TYPE_CHECKING:
@@ -16,14 +21,31 @@ async def shopping_cart(
     user_id: int,
     session: 'AsyncSession'
 ) -> Ingredient:
-    cart = (
-        select(PurchaseCart).where(
-                PurchaseCart.user_id == user_id
+    cart_data = (
+        select(
+            Ingredient.name,
+            Ingredient.measurement_unit,
+            func.sum(
+                RecipeIngredient.amount
+            ).label('amount')
+            ).join(
+                RecipeIngredient,
+                RecipeIngredient.ingredient_id == Ingredient.id
+            ).join(
+                Recipe, Recipe.id == RecipeIngredient.recipe_id
+            ).join(
+                PurchaseCart, PurchaseCart.recipe_id == Recipe.id
+            ).join(
+                User, User.id == PurchaseCart.user_id
+            ).where(
+                User.id == user_id
+            ).group_by(
+                Ingredient.name,
+                Ingredient.measurement_unit
             )
         )
-    # не законченный метод
-    result = await session.scalars(cart)
-    return result.unique().all()
+    result = await session.execute(cart_data)
+    return [row for row in result]
 
 
 async def add_to_shopping_cart(
