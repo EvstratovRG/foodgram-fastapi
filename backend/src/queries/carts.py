@@ -1,0 +1,70 @@
+from sqlalchemy import select, insert
+from typing import TYPE_CHECKING
+from sqlalchemy.exc import IntegrityError
+from fastapi.exceptions import HTTPException
+from fastapi import status
+from src.queries import recipes as recipe_queries
+from src.models.recipes.models import Recipe
+from src.models.recipes.models import Ingredient, PurchaseCart
+from sqlalchemy.exc import SQLAlchemyError
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+
+async def shopping_cart(
+    user_id: int,
+    session: 'AsyncSession'
+) -> Ingredient:
+    cart = (
+        select(PurchaseCart).where(
+                PurchaseCart.user_id == user_id
+            )
+        )
+    # не законченный метод
+    result = await session.scalars(cart)
+    return result.unique().all()
+
+
+async def add_to_shopping_cart(
+    recipe_id: int,
+    current_user_id: int,
+    session: 'AsyncSession'
+) -> Recipe | None:
+    stmt = insert(PurchaseCart).values(
+        recipe_id=recipe_id,
+        user_id=current_user_id
+    )
+    try:
+        cart = await session.scalars(stmt)
+        if not cart:
+            raise IntegrityError('Рецепт не был добавлен в корзину')
+    except IntegrityError as exc:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc.orig),
+        )
+    await session.commit()
+    recipe = await recipe_queries.get_recipe(session, recipe_id)
+    return recipe
+
+
+async def del_from_shopping_cart(
+    recipe_id: int,
+    current_user_id: int,
+    session: 'AsyncSession'
+) -> bool:
+    cart = select(PurchaseCart).where(
+        PurchaseCart.recipe_id == recipe_id,
+        PurchaseCart.user_id == current_user_id
+    )
+    result = await session.scalars(cart)
+    if result is None:
+        return False
+    try:
+        await session.delete(result.first())
+        await session.commit()
+    except SQLAlchemyError:
+        return False
+    return True

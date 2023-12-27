@@ -14,26 +14,7 @@ router = APIRouter(prefix="/recipes", tags=["/recipes"])
 
 
 @router.get(
-    "/{recipe_id}",
-    status_code=status.HTTP_200_OK,
-    response_model=(recipe_schemas.RecipeBaseSchema |
-                    base_schemas.ExceptionSchema)
-)
-async def get_recipe(
-    recipe_id: int,
-    session: AsyncSession = Depends(get_async_session)
-) -> Any:
-    recipe = await recipe_queries.get_recipe(
-        recipe_id=recipe_id,
-        session=session
-    )
-    if recipe is None:
-        raise RecipeNotFoundException
-    return recipe
-
-
-@router.get(
-    "",
+    "/",
     status_code=status.HTTP_200_OK,
     response_model=list[recipe_schemas.RecipeBaseSchema]
 )
@@ -47,7 +28,7 @@ async def get_recipes(
 
 
 @router.post(
-    "",
+    "/",
     status_code=status.HTTP_201_CREATED,
 )
 async def create_recipe(
@@ -65,8 +46,27 @@ async def create_recipe(
     return created_recipe
 
 
+@router.get(
+    "/{recipe_id}/",
+    status_code=status.HTTP_200_OK,
+    response_model=(recipe_schemas.RecipeBaseSchema |
+                    base_schemas.ExceptionSchema)
+)
+async def get_recipe(
+    recipe_id: int,
+    session: AsyncSession = Depends(get_async_session)
+) -> Any:
+    recipe = await recipe_queries.get_recipe(
+        recipe_id=recipe_id,
+        session=session
+    )
+    if recipe is None:
+        raise RecipeNotFoundException
+    return recipe
+
+
 @router.put(
-    "/{recipe_id}",
+    "/{recipe_id}/",
     status_code=status.HTTP_200_OK,
 )
 async def update_recipe(
@@ -87,7 +87,7 @@ async def update_recipe(
 
 
 @router.delete(
-    "/{recipe_id}",
+    "/{recipe_id}/",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=base_schemas.StatusSchema
 )

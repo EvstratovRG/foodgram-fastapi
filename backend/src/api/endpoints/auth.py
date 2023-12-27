@@ -22,7 +22,7 @@ router = APIRouter(prefix="/auth/token", tags=["/auth/token"])
 
 
 @router.post(
-    "/login",
+    "/login/",
     response_model=base_schemas.Token
 )
 async def login_to_get_token(
@@ -52,7 +52,7 @@ async def login_to_get_token(
 
 
 @router.post(
-    "/logout",
+    "/logout/",
     response_model=base_schemas.StatusSchema
 )
 async def delete_users_token(

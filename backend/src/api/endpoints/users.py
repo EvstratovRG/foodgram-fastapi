@@ -15,7 +15,7 @@ router = APIRouter(prefix="/users", tags=["/users"])
 
 
 @router.get(
-    "",
+    "/",
     status_code=status.HTTP_200_OK,
     response_model=(
         list[user_schemas.UserBaseSchema] |
@@ -35,7 +35,7 @@ async def get_users(
 
 
 @router.post(
-    "",
+    "/",
     status_code=status.HTTP_201_CREATED,
     description='Регистрация пользователя',
     response_model=user_schemas.UserBaseSchema
@@ -55,7 +55,7 @@ async def create_user(
 
 
 @router.get(
-    "/me",
+    "/me/",
     status_code=status.HTTP_200_OK,
     response_model=user_schemas.UserBaseSchema
 )
@@ -67,7 +67,7 @@ async def get_me(
 
 
 @router.post(
-    "/set_password",
+    "/set_password/",
     status_code=status.HTTP_200_OK,
     response_model=(
         base_schemas.UpdatePasswordResponseSchema |
@@ -102,7 +102,7 @@ async def change_users_password(
 
 
 @router.get(
-    "/{user_id}",
+    "/{user_id}/",
     status_code=status.HTTP_200_OK,
     response_model=user_schemas.UserBaseSchema
 )

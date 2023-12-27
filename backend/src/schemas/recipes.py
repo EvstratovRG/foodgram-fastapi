@@ -79,13 +79,6 @@ class UpdateRecipeSchema(CreateRecipeSchema):
     pass
 
 
-class PurchaseCart(BaseModel):
-    user_id: int
-    user: UserBaseSchema
-    recipe_id: int
-    recipe: RecipeBaseSchema
-
-
 class FavoriteRecipeSchema(BaseModel):
     id: int
     name: str
@@ -93,7 +86,9 @@ class FavoriteRecipeSchema(BaseModel):
     cooking_time: int
 
 
-class Subcriptions(BaseORMSchema):
-    name: str
-    image: str
-    cooking_time: int
+class Subcriptions(FavoriteRecipeSchema):
+    pass
+
+
+class PurchaseCart(FavoriteRecipeSchema):
+    pass
