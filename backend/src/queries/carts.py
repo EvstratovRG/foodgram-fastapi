@@ -1,5 +1,5 @@
 from sqlalchemy import select, insert, func
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from sqlalchemy.exc import IntegrityError
 from fastapi.exceptions import HTTPException
 from fastapi import status
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 async def shopping_cart(
     user_id: int,
     session: 'AsyncSession'
-) -> Ingredient:
+) -> Any:
     cart_data = (
         select(
             Ingredient.name,
@@ -28,24 +28,24 @@ async def shopping_cart(
             func.sum(
                 RecipeIngredient.amount
             ).label('amount')
-            ).join(
-                RecipeIngredient,
-                RecipeIngredient.ingredient_id == Ingredient.id
-            ).join(
-                Recipe, Recipe.id == RecipeIngredient.recipe_id
-            ).join(
-                PurchaseCart, PurchaseCart.recipe_id == Recipe.id
-            ).join(
-                User, User.id == PurchaseCart.user_id
-            ).where(
-                User.id == user_id
-            ).group_by(
-                Ingredient.name,
-                Ingredient.measurement_unit
-            )
+        ).join(
+            RecipeIngredient,
+            RecipeIngredient.ingredient_id == Ingredient.id
+        ).join(
+            Recipe, Recipe.id == RecipeIngredient.recipe_id
+        ).join(
+            PurchaseCart, PurchaseCart.recipe_id == Recipe.id
+        ).join(
+            User, User.id == PurchaseCart.user_id
+        ).where(
+            User.id == user_id
+        ).group_by(
+            Ingredient.name,
+            Ingredient.measurement_unit
         )
+    )
     result = await session.execute(cart_data)
-    return [row for row in result]
+    return result.fetchall()
 
 
 async def add_to_shopping_cart(

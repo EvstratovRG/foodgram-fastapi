@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, status
+from fastapi.responses import FileResponse
 from typing import Any
 from src.models.users.models import User
 from src.queries import carts as cart_queries
@@ -17,19 +18,31 @@ router = APIRouter(prefix="/recipes", tags=["/recipes"])
 @router.get(
     "/download_shopping_cart/",
     status_code=status.HTTP_200_OK,
-    response_model=list[recipe_schemas.PurchaseCartIngredients]
+    response_class=FileResponse
 )
 async def download_shopping_cart(
     current_user: User = Depends(get_me),
     session: AsyncSession = Depends(get_async_session)
 ) -> Any:
-    shopping_cart = await cart_queries.shopping_cart(
+    shopping_cart: list[str] = await cart_queries.shopping_cart(
         user_id=current_user.id,
         session=session
     )
     if shopping_cart is None:
         raise user_exceptions.SomethingGoesWrong
-    return shopping_cart
+    filepath = "product_cart.txt"
+    with open(filepath, "w") as cart:
+        import re
+        pattern = (r"[\(\)']")
+        cart.write("Список продуктов\n\n")
+        for elem in shopping_cart:
+            elem = re.sub(
+                pattern=pattern,
+                repl="",
+                string=str(elem)
+            )
+            cart.write(elem + '\n')
+    return filepath
 
 
 @router.post(
