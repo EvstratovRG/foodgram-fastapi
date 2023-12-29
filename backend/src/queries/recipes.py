@@ -28,7 +28,7 @@ async def get_recipe(
         ) -> Recipe | None:
     stmt = select(Recipe).where(Recipe.id == recipe_id)
     result = await session.scalars(stmt)
-    return result.first()
+    return result.unique().first()
 
 
 async def get_recipes(
@@ -36,7 +36,7 @@ async def get_recipes(
         ) -> Sequence[Recipe]:
     stmt = select(Recipe)
     result = await session.scalars(stmt)
-    return result.all()
+    return result.unique().all()
 
 
 async def create_recipe_ingredient_entities(

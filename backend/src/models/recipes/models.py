@@ -56,11 +56,17 @@ class Ingredient(TimeMixin, Base):
     id: Mapped[intpk] = mapped_column(autoincrement=True)
     name: Mapped[str_200]
     measurement_unit: Mapped[str_200 | None]
-    recipe: Mapped[list['Recipe']] = relationship(
-        'Recipe',
+    recipes: Mapped[list['Recipe']] = relationship(
         secondary='recipe_ingredient',
-        back_populates='ingredient',
     )
+    recipe_ingredient: Mapped[list['RecipeIngredient']] = relationship(
+        uselist=True,
+        lazy='selectin',
+    )
+
+    @hybrid_property
+    def amount(self):
+        return self.recipe_ingredient[0].amount
 
 
 class Tag(TimeMixin, Base):
@@ -71,10 +77,8 @@ class Tag(TimeMixin, Base):
     name: Mapped[str_200]
     slug: Mapped[str_200 | None]
     color: Mapped[str | None] = mapped_column(String(7))
-    recipe: Mapped[list['Recipe']] = relationship(
-        'Recipe',
+    recipes: Mapped[list['Recipe']] = relationship(
         secondary='recipe_tag',
-        back_populates='tag'
     )
 
 
@@ -210,17 +214,18 @@ class Recipe(TimeMixin, Base):
     author: Mapped['User'] = relationship(
         'User',
         back_populates='recipes',
+        lazy='joined',
     )
-    tag: Mapped[list["Tag"]] = relationship(
+    tags: Mapped[list["Tag"]] = relationship(
         uselist=True,
         secondary='recipe_tag',
-        back_populates='recipe',
+        lazy='joined',
     )
     # uselist - аналог many = True
-    ingredient: Mapped[list["Ingredient"]] = relationship(
+    ingredients: Mapped[list["Ingredient"]] = relationship(
         uselist=True,
         secondary='recipe_ingredient',
-        back_populates='recipe',
+        lazy='joined',
     )
     cart_recipe: Mapped['PurchaseCart'] = relationship(
         'PurchaseCart',

@@ -49,8 +49,7 @@ async def create_recipe(
 @router.get(
     "/{recipe_id}/",
     status_code=status.HTTP_200_OK,
-    response_model=(recipe_schemas.RecipeBaseSchema |
-                    base_schemas.ExceptionSchema)
+    response_model=recipe_schemas.RecipeBaseSchema
 )
 async def get_recipe(
     recipe_id: int,

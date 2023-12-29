@@ -57,6 +57,7 @@ class User(TimeMixin, Base):
         Boolean, default=False, nullable=False
     )
     recipes: Mapped[list['Recipe']] = relationship(
+        'Recipe',
         uselist=True,
         lazy='joined',
     )
