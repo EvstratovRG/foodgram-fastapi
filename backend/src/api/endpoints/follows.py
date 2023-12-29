@@ -3,7 +3,6 @@ from typing import Any
 from src.models.users.models import User
 from src.queries import follows as follow_queries
 from src.schemas import users as user_schemas
-from src.schemas import base as base_schemas
 from src.api.exceptions import users as user_exceptions
 from src.api.endpoints.users import get_me
 from config.db import get_async_session
@@ -16,10 +15,7 @@ router = APIRouter(prefix="/users", tags=["/users"])
 @router.get(
     "/subscriptions/",
     status_code=status.HTTP_200_OK,
-    response_model=(
-        list[user_schemas.GetSubscriptions] |
-        base_schemas.ExceptionSchema
-    )
+    response_model=list[user_schemas.GetSubscriptions]
 )
 async def get_my_subscriptions(
     current_user: User = Depends(get_me),
@@ -37,10 +33,7 @@ async def get_my_subscriptions(
 @router.post(
     "/{user_id}/subscribe/",
     status_code=status.HTTP_201_CREATED,
-    response_model=(
-        user_schemas.GetSubscriptions |
-        base_schemas.ExceptionSchema
-    )
+    response_model=user_schemas.GetSubscriptions
 )
 async def subscribe(
     user_id: int,

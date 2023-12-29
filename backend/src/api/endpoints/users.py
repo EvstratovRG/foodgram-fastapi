@@ -17,10 +17,7 @@ router = APIRouter(prefix="/users", tags=["/users"])
 @router.get(
     "/",
     status_code=status.HTTP_200_OK,
-    response_model=(
-        list[user_schemas.UserBaseSchema] |
-        base_schemas.ExceptionSchema
-    )
+    response_model=list[user_schemas.UserBaseSchema]
 )
 async def get_users(
     session: AsyncSession = Depends(get_async_session),
@@ -69,10 +66,7 @@ async def get_me(
 @router.post(
     "/set_password/",
     status_code=status.HTTP_200_OK,
-    response_model=(
-        base_schemas.UpdatePasswordResponseSchema |
-        base_schemas.ExceptionSchema
-    )
+    response_model=base_schemas.UpdatePasswordResponseSchema
 )
 async def change_users_password(
     user_schema: user_schemas.ChangeUserPassword,

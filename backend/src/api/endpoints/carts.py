@@ -4,7 +4,6 @@ from typing import Any
 from src.models.users.models import User
 from src.queries import carts as cart_queries
 from src.schemas import recipes as recipe_schemas
-from src.schemas import base as base_schemas
 from src.api.exceptions import users as user_exceptions
 from src.api.exceptions import recipes as recipe_exceptions
 from src.api.endpoints.users import get_me
@@ -48,10 +47,7 @@ async def download_shopping_cart(
 @router.post(
     "/{recipe_id}/shopping_cart/",
     status_code=status.HTTP_201_CREATED,
-    response_model=(
-        recipe_schemas.PurchaseCart |
-        base_schemas.ExceptionSchema
-    )
+    response_model=recipe_schemas.PurchaseCart
 )
 async def add_to_shopping_cart(
     recipe_id: int,

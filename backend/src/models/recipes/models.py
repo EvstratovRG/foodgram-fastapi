@@ -221,7 +221,6 @@ class Recipe(TimeMixin, Base):
         secondary='recipe_tag',
         lazy='joined',
     )
-    # uselist - аналог many = True
     ingredients: Mapped[list["Ingredient"]] = relationship(
         uselist=True,
         secondary='recipe_ingredient',

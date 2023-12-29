@@ -3,7 +3,6 @@ from typing import Any
 from src.models.users.models import User
 from src.queries import favorites as favorite_queries
 from src.schemas import recipes as recipe_schemas
-from src.schemas import base as base_schemas
 from src.api.exceptions import recipes as recipe_exceptions
 from src.api.endpoints.users import get_me
 from config.db import get_async_session
@@ -16,10 +15,7 @@ router = APIRouter(prefix="/recipes", tags=["/recipes"])
 @router.post(
     "/{recipe_id}/favorite/",
     status_code=status.HTTP_201_CREATED,
-    response_model=(
-        recipe_schemas.FavoriteRecipeSchema |
-        base_schemas.ExceptionSchema
-    )
+    response_model=recipe_schemas.FavoriteRecipeSchema
 )
 async def favorite(
     recipe_id: int,
