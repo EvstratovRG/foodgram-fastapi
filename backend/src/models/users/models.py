@@ -59,7 +59,7 @@ class User(TimeMixin, Base):
     recipes: Mapped[list['Recipe']] = relationship(
         'Recipe',
         uselist=True,
-        lazy='joined',
+        lazy='selectin',
     )
     follower: Mapped['Follow'] = relationship(
         'Follow',
@@ -71,19 +71,19 @@ class User(TimeMixin, Base):
         'Follow',
         foreign_keys=[Follow.following_id],
         back_populates='following',
-        lazy='joined',
+        lazy='selectin',
     )
     buyer: Mapped['PurchaseCart'] = relationship(
         'PurchaseCart',
         foreign_keys=[PurchaseCart.user_id],
-        back_populates='buyer',
-        lazy='joined',
+        back_populates='users',
+        lazy='selectin',
     )
     favor_user: Mapped['Favorite'] = relationship(
         'Favorite',
         foreign_keys=[Favorite.user_id],
         back_populates='favor_user',
-        lazy='joined',
+        lazy='selectin',
     )
 
     @hybrid_property

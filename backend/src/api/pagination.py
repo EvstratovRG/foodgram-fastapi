@@ -1,7 +1,8 @@
-from fastapi import FastAPI
-from fastapi_pagination import add_pagination
+# from fastapi_pagination.links import Page
 
 
-app = FastAPI()
 
-add_pagination(app)
+
+# app = FastAPI()
+
+# add_pagination(app)

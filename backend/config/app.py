@@ -6,6 +6,7 @@ def get_fastapi_app() -> FastAPI:
     from config.initializers import (
         init_app,
         init_routers,
+        init_admin,
     )
     origins = ['*']
 
@@ -19,5 +20,6 @@ def get_fastapi_app() -> FastAPI:
     )
 
     init_routers(application)
+    init_admin(application)
 
     return application

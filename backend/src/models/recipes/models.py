@@ -68,6 +68,9 @@ class Ingredient(TimeMixin, Base):
     def amount(self):
         return self.recipe_ingredient[0].amount
 
+    def __str__(self):
+        return f'{self.id}, {self.name}, {self.measurement_unit}'
+
 
 class Tag(TimeMixin, Base):
     """Модель данных храненения Тэгов."""
@@ -80,6 +83,9 @@ class Tag(TimeMixin, Base):
     recipes: Mapped[list['Recipe']] = relationship(
         secondary='recipe_tag',
     )
+
+    def __str__(self):
+        return f'{self.id}, {self.name}, {self.color}'
 
 
 class Follow(TimeMixin, Base):
@@ -125,6 +131,9 @@ class Follow(TimeMixin, Base):
             raise IntegrityError('Нельзя подписываться на самого себя')
         return following
 
+    def __str__(self):
+        return f'{self.id}, {self.follower}, {self.following}'
+
 
 class PurchaseCart(TimeMixin, Base):
     """Модель хранения данных о Корзине товаров пользователя."""
@@ -143,7 +152,7 @@ class PurchaseCart(TimeMixin, Base):
             ondelete="CASCADE"
         ),
     )
-    buyer: Mapped['User'] = relationship(
+    users: Mapped['User'] = relationship(
         'User',
         foreign_keys=[user_id],
         back_populates='buyer',
@@ -154,11 +163,14 @@ class PurchaseCart(TimeMixin, Base):
             ondelete="CASCADE"
         ),
     )
-    cart_recipe: Mapped['Recipe'] = relationship(
+    recipe: Mapped['Recipe'] = relationship(
         'Recipe',
         foreign_keys=[recipe_id],
         back_populates='cart_recipe',
     )
+
+    def __str__(self):
+        return f'{self.id}, {self.users}, {self.recipe}'
 
 
 class Favorite(TimeMixin, Base):
@@ -195,6 +207,9 @@ class Favorite(TimeMixin, Base):
         back_populates='favor_recipe',
     )
 
+    def __str__(self):
+        return f'{self.id}, {self.favor_user}, {self.favor_recipe}'
+
 
 class Recipe(TimeMixin, Base):
     """Модель данных хранения Рецептов."""
@@ -229,7 +244,7 @@ class Recipe(TimeMixin, Base):
     cart_recipe: Mapped['PurchaseCart'] = relationship(
         'PurchaseCart',
         foreign_keys=[PurchaseCart.recipe_id],
-        back_populates='cart_recipe',
+        back_populates='recipe',
         lazy='selectin',
     )
     favor_recipe: Mapped['Favorite'] = relationship(
@@ -246,3 +261,6 @@ class Recipe(TimeMixin, Base):
     @hybrid_property
     def is_favorited(self: Self) -> bool:
         return bool(self.favor_recipe)
+
+    def __str__(self):
+        return f'{self.id}, {self.name}, {self.author}'
