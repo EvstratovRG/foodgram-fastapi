@@ -2,7 +2,6 @@ from fastapi import Request, Depends
 from config.db import get_async_session, AsyncSession
 from src.auth.authorization import (
     get_user,
-    # check_user,
 )
 from src.api.exceptions.users import WrongСredentials
 

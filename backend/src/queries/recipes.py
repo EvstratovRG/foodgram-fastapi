@@ -4,6 +4,9 @@ from src.models.recipes.models import (
     Recipe,
     RecipeIngredient,
     RecipeTag,
+    Tag,
+    Favorite,
+    PurchaseCart
 )
 from sqlalchemy import select, insert
 from sqlalchemy.dialects.postgresql import insert as upsert
@@ -32,9 +35,27 @@ async def get_recipe(
 
 
 async def get_recipes(
+        is_favorited: int,
+        is_in_shopping_cart: int,
+        tags: list[str],
+        author: int | None,
         session: 'AsyncSession'
         ) -> Sequence[Recipe]:
-    stmt = select(Recipe)
+    is_favorited = bool(is_favorited)
+    is_in_shopping_cart = bool(is_in_shopping_cart)
+    if not tags:
+        stmt = select(Recipe).where(
+            Recipe.author_id == author,
+            Recipe.is_favorited == is_favorited,
+            Recipe.is_in_shopping_cart == is_in_shopping_cart
+        )
+    else:
+        stmt = select(Recipe).join(Recipe.tags).where(
+            Recipe.author_id == author,
+            Tag.slug.in_(tags),
+            Recipe.is_favorited == is_favorited,
+            Recipe.is_in_shopping_cart == is_in_shopping_cart
+        )
     result = await session.scalars(stmt)
     return result.unique().all()
 

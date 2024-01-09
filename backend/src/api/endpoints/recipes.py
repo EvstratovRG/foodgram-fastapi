@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, status
-from typing import Any
+from fastapi import APIRouter, Depends, Query, status
+from typing import Annotated, Any
 from src.api.endpoints.users import get_me
 from src.models.users.models import User
 from src.queries import recipes as recipe_queries
@@ -12,6 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/recipes", tags=["/recipes"])
 
+# page: int | None,
+# limit: int | None,
+
 
 @router.get(
     "/",
@@ -19,9 +22,17 @@ router = APIRouter(prefix="/recipes", tags=["/recipes"])
     response_model=list[recipe_schemas.RecipeBaseSchema]
 )
 async def get_recipes(
+    is_favorited: int = Query(...),
+    is_in_shopping_cart: int = Query(...),
+    tags: list[str] | None = Query(None),
+    author: int = Query(None),
     session: AsyncSession = Depends(get_async_session)
 ) -> Any:
     recipes = await recipe_queries.get_recipes(
+        tags=tags,
+        author=author,
+        is_favorited=is_favorited,
+        is_in_shopping_cart=is_in_shopping_cart,
         session=session
     )
     return recipes

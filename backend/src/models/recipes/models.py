@@ -3,7 +3,10 @@ from sqlalchemy import (
     String,
     ForeignKey,
     Text,
-    UniqueConstraint
+    UniqueConstraint,
+    cast,
+    Boolean,
+    select
 )
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from src.models.base import Base, TimeMixin, str_200
@@ -245,13 +248,13 @@ class Recipe(TimeMixin, Base):
         'PurchaseCart',
         foreign_keys=[PurchaseCart.recipe_id],
         back_populates='recipe',
-        lazy='selectin',
+        lazy='joined',
     )
     favor_recipe: Mapped['Favorite'] = relationship(
         'Favorite',
         foreign_keys=[Favorite.recipe_id],
         back_populates='favor_recipe',
-        lazy='selectin',
+        lazy='joined',
     )
 
     @hybrid_property
@@ -261,6 +264,16 @@ class Recipe(TimeMixin, Base):
     @hybrid_property
     def is_favorited(self: Self) -> bool:
         return bool(self.favor_recipe)
+
+    @is_favorited.expression
+    @classmethod
+    def is_favorited(cls):
+        return cls.favor_recipe.has(recipe_id=cls.id)
+
+    @is_in_shopping_cart.expression
+    @classmethod
+    def is_in_shopping_cart(cls):
+        return cls.cart_recipe.has(recipe_id=cls.id)
 
     def __str__(self):
         return f'{self.id}, {self.name}, {self.author}'
