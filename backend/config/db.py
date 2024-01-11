@@ -8,12 +8,12 @@ db_config = get_db_config()
 
 async_engine = create_async_engine(
     url=db_config.database_url_asyncpg,
-    echo=True,
+    # echo=True,
 )
 
 sync_engine = create_engine(
     url=db_config.database_url_psycopg,
-    echo=True
+    # echo=True
 )
 AsyncSession = async_sessionmaker(async_engine, expire_on_commit=False)
 SyncSession = sessionmaker(sync_engine)

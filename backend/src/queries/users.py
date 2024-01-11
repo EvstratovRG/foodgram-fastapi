@@ -1,11 +1,11 @@
 from fastapi import HTTPException, status
 from src.schemas import users as users_schema
 from src.models.users.models import User
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, func
 from sqlalchemy.orm import selectinload
-# from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError
 from src.hasher import Hasher
+from src.pagination.paginate import paginate
 
 from typing import TYPE_CHECKING, Sequence
 
@@ -45,16 +45,29 @@ async def get_user(
         ) -> User | None:
     """Получить пользователя по id из базы данных."""
     stmt = (
-        select(User).select_from(User).where(User.id == user_id))
+        select(User).select_from(User).where(User.id == user_id)
+    )
     result = await session.scalars(stmt)
     return result.unique().first()
 
 
-async def get_users(session: 'AsyncSession') -> Sequence[User]:
+async def get_users(
+        page: int,
+        limit: int,
+        session: 'AsyncSession'
+        ) -> Sequence[User]:
     """Получить список всех пользователей из базы данных."""
-    stmt = select(User)
-    result = await session.scalars(stmt)
+    paginate_stmt = paginate(User, page, limit)
+    result = await session.scalars(paginate_stmt)
     return result.unique().all()
+
+
+async def get_users_count(
+        session: 'AsyncSession'
+        ) -> int:
+    stmt = select(func.count()).select_from(User)
+    result = await session.scalar(stmt)
+    return result
 
 
 async def create_user(

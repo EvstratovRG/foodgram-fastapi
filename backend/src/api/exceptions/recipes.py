@@ -14,3 +14,7 @@ ThroughEntityException = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
     detail='Ошибка при создании many-to-many.'
 )
+SomethingGoesWrong = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST,
+    detail='Что то пошло не так'
+)

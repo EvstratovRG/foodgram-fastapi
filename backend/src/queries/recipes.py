@@ -5,10 +5,8 @@ from src.models.recipes.models import (
     RecipeIngredient,
     RecipeTag,
     Tag,
-    Favorite,
-    PurchaseCart
 )
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, func
 from sqlalchemy.dialects.postgresql import insert as upsert
 from sqlalchemy.orm import selectinload
 from src.queries.ingredients import get_ingredient
@@ -18,6 +16,7 @@ from fastapi.exceptions import HTTPException
 from fastapi import status
 from sqlalchemy.exc import SQLAlchemyError
 from src.api.base64_decoder import base64_decoder
+from src.pagination.paginate import paginate
 
 from typing import TYPE_CHECKING, Sequence
 
@@ -34,7 +33,17 @@ async def get_recipe(
     return result.unique().first()
 
 
+async def get_recipes_count(
+        session: 'AsyncSession'
+) -> int:
+    stmt = select(func.count()).select_from(Recipe)
+    result = await session.scalar(stmt)
+    return result
+
+
 async def get_recipes(
+        page: int,
+        limit: int,
         is_favorited: int,
         is_in_shopping_cart: int,
         tags: list[str],
@@ -43,20 +52,26 @@ async def get_recipes(
         ) -> Sequence[Recipe]:
     is_favorited = bool(is_favorited)
     is_in_shopping_cart = bool(is_in_shopping_cart)
+    stmt = select(Recipe)
+    if not author:
+        stmt = stmt.join(Recipe.tags).where(
+            Tag.slug.in_(tags),
+        )
     if not tags:
-        stmt = select(Recipe).where(
+        stmt = stmt.where(
             Recipe.author_id == author,
             Recipe.is_favorited == is_favorited,
             Recipe.is_in_shopping_cart == is_in_shopping_cart
         )
-    else:
-        stmt = select(Recipe).join(Recipe.tags).where(
+    if tags and author:
+        stmt = stmt.join(Recipe.tags).where(
             Recipe.author_id == author,
             Tag.slug.in_(tags),
             Recipe.is_favorited == is_favorited,
             Recipe.is_in_shopping_cart == is_in_shopping_cart
         )
-    result = await session.scalars(stmt)
+    paginate_stmt = paginate(Recipe, page, limit, statement=stmt)
+    result = await session.scalars(paginate_stmt)
     return result.unique().all()
 
 

@@ -4,9 +4,6 @@ from sqlalchemy import (
     ForeignKey,
     Text,
     UniqueConstraint,
-    cast,
-    Boolean,
-    select
 )
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from src.models.base import Base, TimeMixin, str_200
