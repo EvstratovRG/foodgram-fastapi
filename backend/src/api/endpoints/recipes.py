@@ -50,6 +50,12 @@ async def get_recipes(
     )
     if recipes is None:
         raise SomethingGoesWrong
+    recipe_schemas_list = []
+    for r in recipes:
+        r_schema = recipe_schemas.RecipeBaseSchema.model_validate(r)
+        r_schema.image_convert(request)
+        recipe_schemas_list.append(r_schema)
+
     links = LinkCreator.generate_links(
         page=page,
         limit=limit,
@@ -58,7 +64,7 @@ async def get_recipes(
     )
     return RecipePagination(
         count=count,
-        result=recipes,
+        result=recipe_schemas_list,
         **links
     )
 
@@ -88,6 +94,7 @@ async def create_recipe(
     response_model=recipe_schemas.RecipeBaseSchema
 )
 async def get_recipe(
+    request: Request,
     recipe_id: int,
     session: AsyncSession = Depends(get_async_session)
 ) -> Any:
@@ -97,7 +104,9 @@ async def get_recipe(
     )
     if recipe is None:
         raise RecipeNotFoundException
-    return recipe
+    r_schema = recipe_schemas.RecipeBaseSchema.model_validate(recipe)
+    r_schema.image_convert(request)
+    return r_schema
 
 
 @router.put(

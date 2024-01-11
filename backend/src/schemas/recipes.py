@@ -1,6 +1,6 @@
 from pydantic import BaseModel, StringConstraints, Field
-from typing import Annotated
-
+from typing import Annotated, Self
+from fastapi import Request
 from src.schemas.users import UserBaseSchema
 from src.schemas.base import BaseORMSchema
 
@@ -70,6 +70,11 @@ class RecipeBaseSchema(BaseORMSchema):
     ingredients: list[IngredientThroughSchema]
     is_favorited: bool = Field(default=False)
     is_in_shopping_cart: bool = Field(default=False)
+
+    def image_convert(self: Self, request: Request) -> str:
+        if str(request.base_url) in self.image:
+            return
+        self.image = str(request.base_url) + 'media/' + self.image
 
 
 class CreateRecipeSchema(BaseModel):
