@@ -20,6 +20,7 @@ def init_routers(application: FastAPI) -> None:
 
 def init_admin(application: FastAPI) -> None:
     from config.db import sync_engine
+    from config import site_config
     from src.admin.models import (
         UserAdmin,
         RecipeAdmin,
@@ -29,7 +30,13 @@ def init_admin(application: FastAPI) -> None:
         FavoriteAdmin,
         PurchaseCartAdmin,
     )
-    admin = Admin(application, sync_engine)
+    from src.admin.authentication import AdminAuth
+    authentication_backend = AdminAuth(secret_key=site_config.host)
+    admin = Admin(
+        application,
+        sync_engine,
+        authentication_backend=authentication_backend
+    )
     admin.add_view(UserAdmin)
     admin.add_view(RecipeAdmin)
     admin.add_view(TagAdmin)

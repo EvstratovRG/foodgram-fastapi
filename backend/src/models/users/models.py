@@ -72,18 +72,21 @@ class User(TimeMixin, Base):
         foreign_keys=[Follow.following_id],
         back_populates='following',
         lazy='selectin',
+        uselist=True
     )
     buyer: Mapped['PurchaseCart'] = relationship(
         'PurchaseCart',
         foreign_keys=[PurchaseCart.user_id],
         back_populates='users',
         lazy='selectin',
+        uselist=True,
     )
     favor_user: Mapped['Favorite'] = relationship(
         'Favorite',
         foreign_keys=[Favorite.user_id],
         back_populates='favor_user',
         lazy='selectin',
+        uselist=True
     )
 
     @hybrid_property
