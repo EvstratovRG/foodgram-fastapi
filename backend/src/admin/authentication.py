@@ -9,7 +9,7 @@ from src.api.exceptions.users import WrongСredentials
 from src.auth.authorization import create_token
 from datetime import timedelta
 from config import app_config
-# from src.auth.authorization import decode_token
+from src.auth.authorization import decode_token
 
 
 class AdminAuth(AuthenticationBackend):
@@ -39,7 +39,7 @@ class AdminAuth(AuthenticationBackend):
         )
         if verify_is_admin is not True:
             raise WrongСredentials
-        token = create_token(
+        token: str = create_token(
             data={'sub': user.email},
             expires_delta=timedelta(minutes=app_config.token_expire),
         )
@@ -51,26 +51,16 @@ class AdminAuth(AuthenticationBackend):
         return True
 
     async def authenticate(self, request: Request) -> bool:
-        from src.api.dependencies.auth import get_current_user
+        token: str = request.session.get('token')
+        if not token:
+            return False
+        user_email = decode_token(token.replace('Token ', ''))
         session = AsyncSession()
-        if isinstance(
-            get_current_user(
-                session=session,
-                request=request
-            ), User
-        ):
+        stmt = select(User).where(User.email == user_email)
+        try:
+            user = await session.scalar(stmt)
+        finally:
+            session.close()
+        if user.is_superuser is True:
             return True
         return False
-
-        # token = request.session.get("token")
-        # if not token:
-        #     return False
-        # user_email = decode_token(token)
-        # session = AsyncSession()
-        # stmt = select(User).where(User.email == user_email)
-        # try:
-        #     user = await session.scalar(stmt)
-        # finally:
-        #     session.close()
-        # if user.is_superuser is True:
-        # return True
