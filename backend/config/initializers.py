@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from sqladmin import Admin
+from fastapi.staticfiles import StaticFiles
 
 
 def init_app() -> FastAPI:
@@ -7,7 +8,22 @@ def init_app() -> FastAPI:
 
     app_config = get_app_config()
 
-    app = FastAPI(**app_config.model_dump())
+    app = FastAPI(
+        **app_config.model_dump(),
+        docs_url='/api/fastapi-docs/'
+    )
+    # if app.debug:
+    #     app.mount(
+    #         path="/static",
+    #         app=StaticFiles(directory="backend/static/"),
+    #         name="static"
+    #     )
+    #     return app
+    app.mount(
+        path="/static",
+        app=StaticFiles(directory="static/"),
+        name="static"
+    )
     return app
 
 

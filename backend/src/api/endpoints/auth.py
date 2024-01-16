@@ -43,12 +43,12 @@ async def login_to_get_token(
     )
     added_token = await add_token_to_user_instance(
         user=user,
-        login_token=token,
+        login_token=token.replace("Token ", ""),
         session=session,
     )
     if not added_token:
         raise SomethingGoesWrong
-    return {'token': token}
+    return {'Token': token}
 
 
 @router.post(

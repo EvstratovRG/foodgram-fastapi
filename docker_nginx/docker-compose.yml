@@ -15,3 +15,35 @@ services:
     ports:
       - "5435:5432"
     restart: always
+
+  # backend:
+  #   build: ../backend/
+  #   env_file:
+  #     - ../dotenv/.env-app
+  #     - ../dotenv/.env-site
+  #     - ../dotenv/.env
+  #   volumes:
+  #     - static:/static/
+  #     - media:/media/
+  #   depends_on:
+  #     - foodgram_db
+  #   restart: always
+
+  # frontend:
+  #   image: evstratov95/foodgram_frontend
+  #   volumes:
+  #     - ../frontend/:/app/result_build/
+
+  # nginx:
+  #   image: nginx:1.19.3
+  #   ports:
+  #     - "8000:80"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/conf.d/default.conf
+  #     - ../frontend/build:/usr/share/nginx/html/
+  #     - ../docs/:/usr/share/nginx/html/api/docs/
+  #     - static:/var/html/static/
+  #     - media:/var/html/media/
+  #   depends_on:
+  #     - backend
+  #   restart: always

@@ -8,14 +8,17 @@ def calculate_offset(limit: int, page: int) -> int:
 
 
 def paginate(
-    model: type[Base],
-    page: int,
-    limit: int,
+    model: type[Base] | None,
+    page: int | None,
+    limit: int | None,
     statement: Select | None = None
 ) -> Any:
-    offset = calculate_offset(limit=limit, page=page)
+    if page is not None and limit is not None:
+        offset = calculate_offset(limit=limit, page=page)
+        if statement is not None:
+            return statement.limit(limit).offset(offset)
+        return select(model).limit(limit).offset(offset)
+    if model is not None:
+        return select(model)
     if statement is not None:
-        stmt = statement.limit(limit).offset(offset)
-        return stmt
-    stmt = select(model).limit(limit).offset(offset)
-    return stmt
+        return select(statement)

@@ -28,16 +28,16 @@ RecipePagination = pagination_schema.Pagination[
 )
 async def get_recipes(
     request: Request,
-    page: int = Query(...),
-    limit: int = Query(...),
-    is_favorited: int = Query(...),
-    is_in_shopping_cart: int = Query(...),
+    page: int = Query(None),
+    limit: int = Query(None),
+    is_favorited: int = Query(None),
+    is_in_shopping_cart: int = Query(None),
     tags: list[str] = Query(None),
     author: int = Query(None),
     session: AsyncSession = Depends(get_async_session)
 ) -> Any:
     count = await recipe_queries.get_recipes_count(
-        session=session
+        session=session,
     )
     recipes = await recipe_queries.get_recipes(
         page=page,

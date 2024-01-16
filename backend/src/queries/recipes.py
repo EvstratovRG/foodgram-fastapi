@@ -42,27 +42,45 @@ async def get_recipes_count(
 
 
 async def get_recipes(
-        page: int,
-        limit: int,
-        is_favorited: int,
-        is_in_shopping_cart: int,
-        tags: list[str],
+        session: 'AsyncSession',
+        tags: list[str] | None,
         author: int | None,
-        session: 'AsyncSession'
+        page: int | None,
+        limit: int | None,
+        is_favorited: int | None,
+        is_in_shopping_cart: int | None,
         ) -> Sequence[Recipe]:
+    # Переписать этот говно-код, метод работает
     is_favorited = bool(is_favorited)
     is_in_shopping_cart = bool(is_in_shopping_cart)
     stmt = select(Recipe)
-    if not author:
+    if (
+        not tags and
+        not author and
+        not page and
+        not limit and
+        not is_favorited and
+        not is_in_shopping_cart
+    ):
+        paginate_stmt = paginate(Recipe, page=None, limit=None, statement=stmt)
+        result = await session.scalars(paginate_stmt)
+        return result.unique().all()
+    if author is None:
         stmt = stmt.join(Recipe.tags).where(
             Tag.slug.in_(tags),
         )
-    if not tags:
+        paginate_stmt = paginate(Recipe, page, limit, statement=stmt)
+        result = await session.scalars(paginate_stmt)
+        return result.unique().all()
+    if tags is None:
         stmt = stmt.where(
             Recipe.author_id == author,
             Recipe.is_favorited == is_favorited,
             Recipe.is_in_shopping_cart == is_in_shopping_cart
         )
+        paginate_stmt = paginate(Recipe, page, limit, statement=stmt)
+        result = await session.scalars(paginate_stmt)
+        return result.unique().all()
     if tags and author:
         stmt = stmt.join(Recipe.tags).where(
             Recipe.author_id == author,
@@ -70,9 +88,9 @@ async def get_recipes(
             Recipe.is_favorited == is_favorited,
             Recipe.is_in_shopping_cart == is_in_shopping_cart
         )
-    paginate_stmt = paginate(Recipe, page, limit, statement=stmt)
-    result = await session.scalars(paginate_stmt)
-    return result.unique().all()
+        paginate_stmt = paginate(Recipe, page, limit, statement=stmt)
+        result = await session.scalars(paginate_stmt)
+        return result.unique().all()
 
 
 async def create_recipe_ingredient_entities(

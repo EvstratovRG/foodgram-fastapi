@@ -25,8 +25,8 @@ UserPagination = pagination_schema.Pagination[user_schemas.UserBaseSchema]
 )
 async def get_users(
     request: Request,
-    page: int = Query(...),
-    limit: int = Query(...),
+    page: int = Query(None),
+    limit: int = Query(None),
     session: AsyncSession = Depends(get_async_session),
 ) -> Any:
     """Получить список всех пользователей."""

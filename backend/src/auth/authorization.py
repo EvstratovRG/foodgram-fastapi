@@ -46,7 +46,8 @@ def create_token(
         key=app_config.secret,
         algorithm=app_config.algorithm
     )
-    return encoded_jwt
+    token = "Token " + encoded_jwt
+    return token
 
 
 def decode_token(token: str) -> str:
@@ -78,17 +79,10 @@ async def get_user_by_decode_token(
     return user
 
 
-async def get_user(token, session):
+async def get_user(token: str, session: 'AsyncSession'):
     """Получить пользователя."""
+    token = token.replace("Token ", "")
     user = await get_user_by_decode_token(token, session)
     if user is None:
         raise user_exceptions.UserNotFoundException
     return user
-
-
-# async def check_user(token, session):
-#     """Проверить, является ли пользователем."""
-#     is_user = await get_user_by_decode_token(token, session)
-#     if is_user is None:
-#         return False
-#     return True

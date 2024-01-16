@@ -9,7 +9,7 @@ from src.api.exceptions.users import WrongСredentials
 from src.auth.authorization import create_token
 from datetime import timedelta
 from config import app_config
-from src.auth.authorization import decode_token
+# from src.auth.authorization import decode_token
 
 
 class AdminAuth(AuthenticationBackend):
@@ -28,7 +28,9 @@ class AdminAuth(AuthenticationBackend):
         try:
             user = await session.scalar(stmt)
             if user is None:
-                raise WrongСredentials
+                return False
+        except Exception:
+            raise Exception('говно-говна')
         finally:
             session.close()
         verify_is_admin = Hasher.verify_password(
@@ -49,14 +51,26 @@ class AdminAuth(AuthenticationBackend):
         return True
 
     async def authenticate(self, request: Request) -> bool:
-        token = request.session.get("token")
-        user_email = decode_token(token)
+        from src.api.dependencies.auth import get_current_user
         session = AsyncSession()
-        stmt = select(User).where(User.email == user_email)
-        try:
-            user = await session.scalar(stmt)
-        finally:
-            session.close()
-        if user.is_superuser is True:
+        if isinstance(
+            get_current_user(
+                session=session,
+                request=request
+            ), User
+        ):
             return True
         return False
+
+        # token = request.session.get("token")
+        # if not token:
+        #     return False
+        # user_email = decode_token(token)
+        # session = AsyncSession()
+        # stmt = select(User).where(User.email == user_email)
+        # try:
+        #     user = await session.scalar(stmt)
+        # finally:
+        #     session.close()
+        # if user.is_superuser is True:
+        # return True

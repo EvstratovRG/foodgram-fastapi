@@ -52,8 +52,8 @@ async def get_user(
 
 
 async def get_users(
-        page: int,
-        limit: int,
+        page: int | None,
+        limit: int | None,
         session: 'AsyncSession'
         ) -> Sequence[User]:
     """Получить список всех пользователей из базы данных."""

@@ -15,12 +15,16 @@ class LinkCreator:
 
     @staticmethod
     def generate_links(
-        page: int,
-        limit: int,
         total: int,
+        page: int | None,
+        limit: int | None,
         request: Request
     ) -> Any:
         links = {}
+        if page is None and limit is None:
+            links["next"] = None
+            links["previous"] = None
+            return links
         if page * limit < total:
             links["next"] = LinkCreator.create_link(
                 request=request,

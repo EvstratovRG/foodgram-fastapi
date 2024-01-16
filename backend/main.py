@@ -3,6 +3,7 @@ import uvicorn
 from config.app import get_fastapi_app
 from config import site_config
 
+
 app = get_fastapi_app()
 
 
