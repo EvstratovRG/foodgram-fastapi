@@ -21,7 +21,7 @@ class ExceptionSchema(DetailSchema):
 
 
 class Token(BaseModel):
-    Token: str
+    auth_token: str
 
 
 class AuthLoginSchema(BaseModel):

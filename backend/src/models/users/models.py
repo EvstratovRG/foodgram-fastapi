@@ -96,3 +96,6 @@ class User(TimeMixin, Base):
     @hybrid_property
     def recipes_count(self: Self) -> int:
         return len(self.recipes)
+
+    def __str__(self) -> str:
+        return f'{self.username}, {self.email}'

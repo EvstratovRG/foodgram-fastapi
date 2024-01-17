@@ -28,7 +28,7 @@ services:
     restart: always
 
   frontend:
-    image: evstratov95/foodgram_frontend
+    build: ../frontend/
     volumes:
       - ../frontend/:/app/result_build/
 

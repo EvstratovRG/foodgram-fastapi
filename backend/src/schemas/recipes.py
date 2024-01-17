@@ -96,6 +96,11 @@ class FavoriteRecipeSchema(BaseModel):
     image: str
     cooking_time: int
 
+    def image_convert(self: Self, request: Request) -> str:
+        if str(request.base_url) in self.image:
+            return
+        self.image = str(request.base_url) + 'media/' + self.image
+
 
 class Subcriptions(FavoriteRecipeSchema):
     pass

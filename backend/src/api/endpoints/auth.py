@@ -1,5 +1,5 @@
 from datetime import timedelta
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from src.queries.users import (
     add_token_to_user_instance,
     delete_token_from_user_instance,
@@ -23,7 +23,8 @@ router = APIRouter(prefix="/auth/token", tags=["/auth/token"])
 
 @router.post(
     "/login/",
-    response_model=base_schemas.Token
+    response_model=base_schemas.Token,
+    status_code=status.HTTP_201_CREATED
 )
 async def login_to_get_token(
     schema: base_schemas.AuthLoginSchema,
@@ -48,7 +49,7 @@ async def login_to_get_token(
     )
     if not added_token:
         raise SomethingGoesWrong
-    return {'Token': token}
+    return {'auth_token': token}
 
 
 @router.post(

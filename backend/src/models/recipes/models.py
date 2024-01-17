@@ -34,6 +34,13 @@ class RecipeIngredient(TimeMixin, Base):
     )
     amount: Mapped[int] = mapped_column(Integer, default=1)
 
+    def __str__(self) -> str:
+        return (
+            f'id Рецепта{self.recipe_id}, '
+            f'id Ингредиента{self.ingredient_id} '
+            f'- кол-во {self.amount}'
+        )
+
 
 class RecipeTag(TimeMixin, Base):
     """Сквозная модель Рецепта и Тегов для хранения many-to-many связи."""
@@ -47,6 +54,12 @@ class RecipeTag(TimeMixin, Base):
         ForeignKey('tag.id'),
         primary_key=True,
     )
+
+    def __str__(self) -> str:
+        return (
+            f'id Рецепта{self.recipe_id}, '
+            f'id Тега{self.tag_id} '
+        )
 
 
 class Ingredient(TimeMixin, Base):
