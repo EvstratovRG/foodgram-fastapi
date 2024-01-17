@@ -29,8 +29,6 @@ class AdminAuth(AuthenticationBackend):
             user = await session.scalar(stmt)
             if user is None:
                 return False
-        except Exception:
-            raise Exception('говно-говна')
         finally:
             session.close()
         verify_is_admin = Hasher.verify_password(

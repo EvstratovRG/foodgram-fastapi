@@ -5,12 +5,10 @@ from sqlalchemy.orm import sessionmaker
 from config import get_db_config
 
 db_config = get_db_config()
-
 async_engine = create_async_engine(
     url=db_config.database_url_asyncpg,
     # echo=True,
 )
-
 sync_engine = create_engine(
     url=db_config.database_url_psycopg,
     # echo=True

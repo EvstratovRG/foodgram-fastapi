@@ -38,26 +38,27 @@ class DatabaseSettings(BaseSettings):
         env_file=APP_PATH / 'dotenv' / '.env',
     )
 
-    POSTGRES_HOST: str
-    POSTGRES_USER: str
-    POSTGRES_PORT: int
-    POSTGRES_DB: str
-    POSTGRES_PASSWORD: str
+    postgres_host: str
+    postgres_user: str
+    postgres_port: int
+    postgres_db: str
+    postgres_password: str
+    allowed_hosts: str
 
     @property
     def database_url_asyncpg(self):
         return (f'postgresql+asyncpg://'
-                f'{self.POSTGRES_USER}:'
-                f'{self.POSTGRES_PASSWORD}@'
-                f'{self.POSTGRES_HOST}:'
-                f'{self.POSTGRES_PORT}/'
-                f'{self.POSTGRES_DB}')
+                f'{self.postgres_user}:'
+                f'{self.postgres_password}@'
+                f'{self.postgres_host}:'
+                f'{self.postgres_port}/'
+                f'{self.postgres_db}')
 
     @property
     def database_url_psycopg(self):
         return (f'postgresql+psycopg2://'
-                f'{self.POSTGRES_USER}:'
-                f'{self.POSTGRES_PASSWORD}@'
-                f'{self.POSTGRES_HOST}:'
-                f'{self.POSTGRES_PORT}/'
-                f'{self.POSTGRES_DB}')
+                f'{self.postgres_user}:'
+                f'{self.postgres_password}@'
+                f'{self.postgres_host}:'
+                f'{self.postgres_port}/'
+                f'{self.postgres_db}')

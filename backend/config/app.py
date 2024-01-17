@@ -8,17 +8,15 @@ def get_fastapi_app() -> FastAPI:
         init_routers,
         init_admin,
     )
-    origins = ['*']
 
     application: FastAPI = init_app()
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,
+        allow_origins=['*'],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
     init_routers(application)
     init_admin(application)
 

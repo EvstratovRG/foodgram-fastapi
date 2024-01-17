@@ -10,7 +10,9 @@ def init_app() -> FastAPI:
 
     app = FastAPI(
         **app_config.model_dump(),
-        docs_url='/api/fastapi-docs/'
+        docs_url='/api/fastapi-docs/',
+        openapi_url="/api/openapi.json",
+        redoc_url=None
     )
     # if app.debug:
     #     app.mount(
@@ -24,6 +26,7 @@ def init_app() -> FastAPI:
         app=StaticFiles(directory="static/"),
         name="static"
     )
+
     return app
 
 
