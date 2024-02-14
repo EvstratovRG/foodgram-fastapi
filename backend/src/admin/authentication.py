@@ -1,3 +1,4 @@
+from fastapi.responses import RedirectResponse
 from sqladmin.authentication import AuthenticationBackend
 from fastapi.requests import Request
 from config.db import AsyncSession
@@ -5,11 +6,10 @@ from src.models.users.models import User
 from sqlalchemy import select
 from src.hasher import Hasher
 from typing import Self
-from src.api.exceptions.users import WrongСredentials
 from src.auth.authorization import create_token
 from datetime import timedelta
 from config import app_config
-from src.auth.authorization import decode_token
+from src.auth.authorization import decode_admin_session_token
 
 
 class AdminAuth(AuthenticationBackend):
@@ -36,7 +36,10 @@ class AdminAuth(AuthenticationBackend):
             user.hashed_password
         )
         if verify_is_admin is not True:
-            raise WrongСredentials
+            return RedirectResponse(
+                request.url_for("admin:login"),
+                status_code=302,
+            )
         token: str = create_token(
             data={'sub': user.email},
             expires_delta=timedelta(minutes=app_config.token_expire),
@@ -52,13 +55,21 @@ class AdminAuth(AuthenticationBackend):
         token: str = request.session.get('token')
         if not token:
             return False
-        user_email = decode_token(token.replace('Token ', ''))
+        user_email = decode_admin_session_token(
+            token.replace('Token ', ''),
+            request,
+        )
+        if not user_email:
+            return RedirectResponse(
+                request.url_for("admin:login"),
+                status_code=302,
+            )
         session = AsyncSession()
         stmt = select(User).where(User.email == user_email)
         try:
             user = await session.scalar(stmt)
         finally:
-            session.close()
+            await session.close()
         if user.is_superuser is True:
             return True
         return False

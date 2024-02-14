@@ -1,0 +1,13 @@
+version: '3.3'
+
+volumes:
+  foodgram_data:
+
+services:
+
+  foodgram_db_local:
+    image: postgres:13.0
+    volumes:
+      - foodgram_data:/var/lib/postgresql/data
+    env_file: ../dotenv/.env
+    restart: always

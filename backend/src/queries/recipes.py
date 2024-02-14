@@ -52,12 +52,13 @@ async def get_recipes(
         ) -> Sequence[Recipe]:
     is_favorited = bool(is_favorited)
     is_in_shopping_cart = bool(is_in_shopping_cart)
-    stmt = select(Recipe)
+    stmt = select(Recipe).where(
+        Recipe.is_favorited == is_favorited,
+        Recipe.is_in_shopping_cart == is_in_shopping_cart
+    )
     if author is not None:
         stmt = stmt.where(
-            Recipe.author_id == author,
-            Recipe.is_favorited == is_favorited,
-            Recipe.is_in_shopping_cart == is_in_shopping_cart
+            Recipe.author_id == author
         )
     if tags is not None and tags != []:
         stmt = stmt.join(Recipe.tags).where(

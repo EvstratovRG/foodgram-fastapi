@@ -67,7 +67,7 @@ class Ingredient(TimeMixin, Base):
     __tablename__ = "ingredient"
 
     id: Mapped[intpk] = mapped_column(autoincrement=True)
-    name: Mapped[str_200]
+    name: Mapped[str_200] = mapped_column(String, unique=True)
     measurement_unit: Mapped[str_200 | None]
     recipes: Mapped[list['Recipe']] = relationship(
         secondary='recipe_ingredient',
@@ -90,7 +90,7 @@ class Tag(TimeMixin, Base):
     __tablename__ = "tag"
 
     id: Mapped[intpk] = mapped_column(autoincrement=True)
-    name: Mapped[str_200]
+    name: Mapped[str_200] = mapped_column(String, unique=True)
     slug: Mapped[str_200 | None]
     color: Mapped[str | None] = mapped_column(String(7))
     recipes: Mapped[list['Recipe']] = relationship(

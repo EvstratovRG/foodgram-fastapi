@@ -64,7 +64,7 @@ async def get_recipes(
     )
     return RecipePagination(
         count=count,
-        result=recipe_schemas_list,
+        results=recipe_schemas_list,
         **links
     )
 
@@ -109,7 +109,7 @@ async def get_recipe(
     return r_schema
 
 
-@router.put(
+@router.patch(
     "/{recipe_id}/",
     status_code=status.HTTP_200_OK,
 )

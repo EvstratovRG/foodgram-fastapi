@@ -1,3 +1,4 @@
+from fastapi import Request
 from src.queries import users as user_queries
 from src.hasher import Hasher
 from src.models.users.models import User
@@ -62,6 +63,21 @@ def decode_token(token: str) -> str:
             raise user_exceptions.WrongСredentials
     except JWTError:
         raise user_exceptions.WrongСredentials
+    return email
+
+
+def decode_admin_session_token(token: str, request: Request) -> str | bool:
+    try:
+        payload = jwt.decode(
+            token,
+            app_config.secret,
+            app_config.algorithm
+        )
+        email: str = payload.get("sub")
+        if email is None:
+            raise user_exceptions.WrongСredentials
+    except JWTError:
+        return False
     return email
 
 

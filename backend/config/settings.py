@@ -30,12 +30,16 @@ class ApplicationSettings(BaseSettings):
     token_expire: int
     algorithm: str
     media: str
+    data: str
 
 
 class DatabaseSettings(BaseSettings):
 
+    # model_config = SettingsConfigDict(
+    #     env_file=APP_PATH / 'dotenv' / '.env',
+    # )
     model_config = SettingsConfigDict(
-        env_file=APP_PATH / 'dotenv' / '.env',
+        env_file=APP_PATH / 'dotenv' / '.env-local',
     )
 
     postgres_host: str

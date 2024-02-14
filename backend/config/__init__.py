@@ -26,3 +26,4 @@ site_config = get_site_config()
 db_config = get_db_config()
 
 media_root: str = base_dir + app_config.media
+csv_data_root: str = base_dir + app_config.data

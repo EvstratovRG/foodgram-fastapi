@@ -9,4 +9,4 @@ class Pagination(BaseModel, Generic[T]):
     count: int
     next: str | None
     previous: str | None = None
-    result: list[T]
+    results: list[T] = None
