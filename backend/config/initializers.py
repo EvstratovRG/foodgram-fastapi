@@ -21,9 +21,15 @@ def init_app() -> FastAPI:
     #         name="static"
     #     )
     #     return app
+    # путь для локальной разработки
+    # app.mount(
+    #     path="/static",
+    #     app=StaticFiles(directory="backend/static/"),
+    #     name="static"
+    # )
     app.mount(
         path="/static",
-        app=StaticFiles(directory="backend/static/"),
+        app=StaticFiles(directory="static/"),
         name="static"
     )
 

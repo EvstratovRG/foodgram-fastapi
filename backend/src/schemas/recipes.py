@@ -64,7 +64,7 @@ class RecipeBaseSchema(BaseORMSchema):
     name: str_200
     text: str
     cooking_time: int
-    image: str
+    image: str | None = None
     author: UserBaseSchema
     tags: list[BaseTagSchema]
     ingredients: list[IngredientThroughSchema]
@@ -72,6 +72,8 @@ class RecipeBaseSchema(BaseORMSchema):
     is_in_shopping_cart: bool = Field(default=False)
 
     def image_convert(self: Self, request: Request) -> str:
+        if self.image is None:
+            return None
         if str(request.base_url) in self.image:
             return
         self.image = str(request.base_url) + 'media/' + self.image

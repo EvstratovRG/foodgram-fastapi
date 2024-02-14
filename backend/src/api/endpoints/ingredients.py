@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from typing import Any
 
 from src.queries import ingredients as ingredient_queries
@@ -17,10 +17,12 @@ router = APIRouter(prefix="/ingredients", tags=["/ingredients"])
     response_model=list[ingredient_schemas.BaseIngredientSchema]
 )
 async def get_ingredients(
+    name: str | None = Query(None),
     session: AsyncSession = Depends(get_async_session)
 ) -> Any:
     ingredients = await ingredient_queries.get_ingredients(
-        session=session
+        session=session,
+        name=name,
     )
     return ingredients
 

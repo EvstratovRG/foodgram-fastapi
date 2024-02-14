@@ -20,8 +20,13 @@ async def get_ingredient(
     return result.first()
 
 
-async def get_ingredients(session: 'AsyncSession') -> Sequence[Ingredient]:
+async def get_ingredients(
+        session: 'AsyncSession',
+        name: str | None = None
+) -> Sequence[Ingredient]:
     stmt = select(Ingredient)
+    if name:
+        stmt = stmt.where(Ingredient.name.ilike(name + '%'))
     result = await session.scalars(stmt)
     return result.all()
 
