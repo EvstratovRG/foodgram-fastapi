@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from src.schemas import users as users_schema
-from src.models.users.models import User
+from src.models.users import User
 from sqlalchemy import select, insert, func
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError

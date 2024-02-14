@@ -1,4 +1,4 @@
-from src.models.recipes.models import Tag
+from src.models.recipes import Tag
 from sqlalchemy import select
 from src.schemas.recipes import CreateTagSchema
 from sqlalchemy.exc import IntegrityError

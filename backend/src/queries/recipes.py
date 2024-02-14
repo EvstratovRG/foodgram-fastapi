@@ -1,6 +1,6 @@
-from src.models.users.models import User
+from src.models.users import User
 from src.schemas import recipes as recipes_schema
-from src.models.recipes.models import (
+from src.models.recipes import (
     Recipe,
     RecipeIngredient,
     RecipeTag,

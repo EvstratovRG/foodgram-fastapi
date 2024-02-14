@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import FileResponse
 from typing import Any
-from src.models.users.models import User
+from src.models.users import User
 from src.queries import carts as cart_queries
 from src.schemas import recipes as recipe_schemas
 from src.api.exceptions import users as user_exceptions

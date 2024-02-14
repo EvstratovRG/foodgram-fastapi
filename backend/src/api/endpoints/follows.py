@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from typing import Any
-from src.models.users.models import User
+from src.models.users import User
 from src.queries import follows as follow_queries
 from src.schemas import users as user_schemas
 from src.api.exceptions import users as user_exceptions

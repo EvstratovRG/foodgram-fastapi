@@ -5,7 +5,8 @@ from sqlalchemy.exc import IntegrityError
 from fastapi.exceptions import HTTPException
 from fastapi import status
 from src.queries import users as user_queries
-from src.models.users.models import User, Follow
+from src.models.users import User
+from src.models.recipes import Follow
 from sqlalchemy.exc import SQLAlchemyError
 from src.api.exceptions import users as user_exceptions
 

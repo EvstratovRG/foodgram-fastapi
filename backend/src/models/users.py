@@ -4,10 +4,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from src.models.base import Base, TimeMixin
 from typing import Annotated, TYPE_CHECKING, Self
 from src.models.base import str_150
-from src.models.recipes.models import Follow, PurchaseCart, Favorite
+from src.models.recipes import Follow, PurchaseCart, Favorite
 
 if TYPE_CHECKING:
-    from src.models.recipes.models import Recipe
+    from src.models.recipes import Recipe
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]

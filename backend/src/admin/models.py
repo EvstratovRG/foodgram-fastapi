@@ -4,8 +4,8 @@ from fastapi import Request
 from fastapi.responses import RedirectResponse
 from sqladmin import ModelView, action
 from sqlalchemy import delete
-from src.models.users.models import User
-from src.models.recipes.models import (
+from src.models.users import User
+from src.models.recipes import (
     Recipe,
     Tag,
     Ingredient,

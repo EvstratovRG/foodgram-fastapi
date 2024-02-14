@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query, status, Request
 from typing import Any
 from src.pagination.links import LinkCreator
 from src.api.endpoints.users import get_me
-from src.models.users.models import User
+from src.models.users import User
 from src.queries import recipes as recipe_queries
 from src.schemas import recipes as recipe_schemas
 from src.pagination import schemas as pagination_schema

@@ -1,7 +1,7 @@
 from fastapi import Request
 from src.queries import users as user_queries
 from src.hasher import Hasher
-from src.models.users.models import User
+from src.models.users import User
 from datetime import timedelta, datetime
 from typing import TYPE_CHECKING
 from config import app_config

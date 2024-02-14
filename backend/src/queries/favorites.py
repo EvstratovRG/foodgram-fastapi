@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from fastapi.exceptions import HTTPException
 from fastapi import status
 from src.queries import recipes as recipe_queries
-from src.models.recipes.models import Recipe, Favorite
+from src.models.recipes import Recipe, Favorite
 from sqlalchemy.exc import SQLAlchemyError
 
 if TYPE_CHECKING:

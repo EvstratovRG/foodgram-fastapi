@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status, Request
 from typing import Any
-from src.models.users.models import User
+from src.models.users import User
 from src.queries import favorites as favorite_queries
 from src.schemas import recipes as recipe_schemas
 from src.api.exceptions import recipes as recipe_exceptions

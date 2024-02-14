@@ -4,8 +4,8 @@ from sqlalchemy.exc import IntegrityError
 from fastapi.exceptions import HTTPException
 from fastapi import status
 from src.queries import recipes as recipe_queries
-from src.models.users.models import User
-from src.models.recipes.models import (
+from src.models.users import User
+from src.models.recipes import (
     Ingredient,
     PurchaseCart,
     RecipeIngredient,

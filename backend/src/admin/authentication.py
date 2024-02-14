@@ -2,7 +2,7 @@ from fastapi.responses import RedirectResponse
 from sqladmin.authentication import AuthenticationBackend
 from fastapi.requests import Request
 from config.db import AsyncSession
-from src.models.users.models import User
+from src.models.users import User
 from sqlalchemy import select
 from src.hasher import Hasher
 from typing import Self

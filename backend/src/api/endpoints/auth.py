@@ -14,7 +14,7 @@ from src.api.exceptions.users import SomethingGoesWrong, WrongСredentials
 from config import app_config
 from typing import Any
 from src.api.dependencies.auth import get_current_user
-from src.models.users.models import User
+from src.models.users import User
 
 from sqlalchemy.ext.asyncio import AsyncSession
 

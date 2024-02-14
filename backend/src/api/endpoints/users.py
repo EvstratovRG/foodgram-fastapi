@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status, Query
 from typing import Any
-from src.models.users.models import User
+from src.models.users import User
 from src.api.dependencies.auth import get_current_user
 from src.api.exceptions import users as user_exceptions
 from src.queries import users as user_queries

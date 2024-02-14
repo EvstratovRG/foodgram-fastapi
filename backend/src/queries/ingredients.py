@@ -1,4 +1,4 @@
-from src.models.recipes.models import Ingredient
+from src.models.recipes import Ingredient
 from sqlalchemy import select
 from src.schemas.recipes import CreateIngredientSchema
 from fastapi.exceptions import HTTPException

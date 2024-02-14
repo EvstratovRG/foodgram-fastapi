@@ -13,7 +13,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.hybrid import hybrid_property
 
 if TYPE_CHECKING:
-    from src.models.users.models import User
+    from src.models.users import User
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
