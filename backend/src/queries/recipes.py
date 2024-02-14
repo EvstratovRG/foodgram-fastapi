@@ -52,6 +52,7 @@ async def get_recipes(
         ) -> Sequence[Recipe]:
     is_favorited = bool(is_favorited)
     is_in_shopping_cart = bool(is_in_shopping_cart)
+    # если добавить в избранные или в шоппинг карт, рецепты не отображаются
     stmt = select(Recipe).where(
         Recipe.is_favorited == is_favorited,
         Recipe.is_in_shopping_cart == is_in_shopping_cart

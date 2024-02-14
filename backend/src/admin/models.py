@@ -216,10 +216,10 @@ class FollowAdmin(
     name = 'Подписки'
     name_plural = 'Подписки'
     # column_list = [c.name for c in Follow.__table__.c]
-    column_list = ['__all__']
+    column_list = [Follow.id, Follow.follower_id, Follow.following_id]
     form_columns = [
-        'follower_id',
-        'following_id'
+        Follow.follower_id,
+        Follow.following_id
     ]
 
 

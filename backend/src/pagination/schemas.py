@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Generic, TypeVar
 
 
@@ -9,4 +9,4 @@ class Pagination(BaseModel, Generic[T]):
     count: int
     next: str | None
     previous: str | None = None
-    results: list[T] = None
+    results: list[T] = Field([])

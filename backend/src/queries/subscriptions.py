@@ -1,4 +1,4 @@
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, func
 from sqlalchemy.orm import joinedload
 from typing import Sequence, TYPE_CHECKING
 from sqlalchemy.exc import IntegrityError
@@ -6,27 +6,67 @@ from fastapi.exceptions import HTTPException
 from fastapi import status
 from src.queries import users as user_queries
 from src.models.users import User
-from src.models.recipes import Follow
+from src.models.recipes import Follow, Recipe
 from sqlalchemy.exc import SQLAlchemyError
 from src.api.exceptions import users as user_exceptions
+from src.pagination.paginate import paginate
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def get_subscriptions(
+    page: int,
+    limit: int,
     user_id: int,
     session: 'AsyncSession'
 ) -> Sequence[User]:
-    query = (
+    stmt = (
         select(User).options(
             joinedload(User.following),
             joinedload(User.recipes)).where(
                 Follow.following_id == user_id
             )
         )
-    result = await session.scalars(query)
+    paginate_stmt = paginate(page=page, limit=limit, statement=stmt)
+    result = await session.scalars(paginate_stmt)
     return result.unique().all()
+
+
+async def get_subscribe_users_recipes(
+        user_id: int,
+        recipes_limit: int,
+        session: 'AsyncSession'
+        ) -> Sequence[Recipe]:
+    stmt = (
+        select(Recipe)
+        .where(Recipe.author_id == user_id)
+        .limit(recipes_limit)
+    )
+    result = await session.scalars(stmt)
+    return result.unique().all()
+
+
+async def get_subscribe_users_recipes_count(
+        user_id: int,
+        session: 'AsyncSession'
+        ) -> int:
+    stmt = select(func.count()).select_from(Recipe).where(
+        Recipe.author_id == user_id
+    )
+    result = await session.scalar(stmt)
+    return result
+
+
+async def get_subscribed_users_count(
+        user_id: int,
+        session: 'AsyncSession'
+        ) -> int:
+    stmt = select(func.count()).select_from(Follow).where(
+        Follow.following_id == user_id
+    )
+    result = await session.scalar(stmt)
+    return result
 
 
 async def subsribe(
