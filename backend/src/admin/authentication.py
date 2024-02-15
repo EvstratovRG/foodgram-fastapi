@@ -20,6 +20,7 @@ class AdminAuth(AuthenticationBackend):
         form = await request.form()
         session = AsyncSession()
         email, password = form["username"], form["password"]
+        # в поле username необходимо вносить email пользователя
         stmt = select(User).where(
             User.email == email
             ).where(

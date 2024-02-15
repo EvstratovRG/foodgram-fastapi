@@ -35,12 +35,13 @@ class ApplicationSettings(BaseSettings):
 
 class DatabaseSettings(BaseSettings):
 
-    # model_config = SettingsConfigDict(
-    #     env_file=APP_PATH / 'dotenv' / '.env',
-    # )
     model_config = SettingsConfigDict(
-        env_file=APP_PATH / 'dotenv' / '.env-local',
+        env_file=APP_PATH / 'dotenv' / '.env',
     )
+    # энв для локали
+    # model_config = SettingsConfigDict(
+    #     env_file=APP_PATH / 'dotenv' / '.env-local',
+    # )
 
     postgres_host: str
     postgres_user: str
