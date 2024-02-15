@@ -36,7 +36,12 @@ async def get_recipes(
     author: int = Query(None),
     session: AsyncSession = Depends(get_async_session)
 ) -> Any:
+    if is_favorited is not None or is_in_shopping_cart is not None:
+        is_favorited = bool(is_favorited)
+        is_in_shopping_cart = bool(is_in_shopping_cart)
     count = await recipe_queries.get_recipes_count(
+        is_favorited,
+        is_in_shopping_cart,
         session=session,
     )
     recipes = await recipe_queries.get_recipes(

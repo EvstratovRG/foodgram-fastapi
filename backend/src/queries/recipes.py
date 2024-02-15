@@ -34,9 +34,19 @@ async def get_recipe(
 
 
 async def get_recipes_count(
+        is_favorited: bool | None,
+        is_in_shopping_cart: bool | None,
         session: 'AsyncSession'
 ) -> int:
-    stmt = select(func.count()).select_from(Recipe)
+    stmt = (select(func.count()).select_from(Recipe))
+    if is_favorited is True:
+        stmt = stmt.where(
+            Recipe.is_favorited == is_favorited
+        )
+    if is_in_shopping_cart is True:
+        stmt = stmt.where(
+            Recipe.is_in_shopping_cart == is_in_shopping_cart
+        )
     result = await session.scalar(stmt)
     return result
 
@@ -47,17 +57,17 @@ async def get_recipes(
         author: int | None,
         page: int | None,
         limit: int | None,
-        is_favorited: int | None,
-        is_in_shopping_cart: int | None,
+        is_favorited: bool | None,
+        is_in_shopping_cart: bool | None,
         ) -> Sequence[Recipe]:
-    is_favorited = bool(is_favorited)
-    is_in_shopping_cart = bool(is_in_shopping_cart)
-    # если добавить в избранные или в шоппинг карт, рецепты не отображаются
     stmt = select(Recipe)
-    if is_favorited is True or is_in_shopping_cart is True:
+    if is_favorited is True:
         stmt = stmt.where(
             Recipe.is_favorited == is_favorited,
-            Recipe.is_in_shopping_cart == is_in_shopping_cart
+        )
+    if is_in_shopping_cart is True:
+        stmt = stmt.where(
+            Recipe.is_in_shopping_cart == is_in_shopping_cart,
         )
     if author is not None:
         stmt = stmt.where(
