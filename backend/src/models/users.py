@@ -66,6 +66,7 @@ class User(TimeMixin, Base):
         foreign_keys=[Follow.follower_id],
         back_populates='follower',
         lazy='selectin',
+        uselist=True
     )
     following: Mapped['Follow'] = relationship(
         'Follow',

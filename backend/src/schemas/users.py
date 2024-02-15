@@ -33,8 +33,8 @@ class ChangeUserPassword(BaseModel):
 
 
 class GetSubscriptions(UserBaseSchema):
-    recipes: list['Subcriptions']
-    recipes_count: int
+    recipes: list['Subcriptions'] | None = None
+    recipes_count: int | None = None
 
 
 from src.schemas.recipes import Subcriptions

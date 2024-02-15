@@ -19,7 +19,7 @@ class LinkCreator:
         page: int | None,
         limit: int | None,
         request: Request
-    ) -> Any:
+    ) -> dict[str, str]:
         links = {}
         if page is None and limit is None:
             links["next"] = None

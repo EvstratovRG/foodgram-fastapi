@@ -23,9 +23,8 @@ async def get_subscriptions(
 ) -> Sequence[User]:
     stmt = (
         select(User).options(
-            joinedload(User.following),
-            joinedload(User.recipes)).where(
-                Follow.following_id == user_id
+            joinedload(User.follower)).where(
+                User.follower.has(following_id=user_id)
             )
         )
     paginate_stmt = paginate(page=page, limit=limit, statement=stmt)
@@ -81,9 +80,7 @@ async def subsribe(
         following_id=current_user_id
     )
     try:
-        follow = await session.scalars(stmt)
-        if not follow:
-            raise IntegrityError('Пользователь не создан')
+        await session.execute(stmt)
     except IntegrityError as exc:
         await session.rollback()
         raise HTTPException(

@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, status, Query, Request
 from typing import Any
+from src.models.recipes import Recipe
 from src.pagination.links import LinkCreator
 from src.pagination import schemas as pagination_schema
 from src.models.users import User
 from src.queries import subscriptions as subscribe_queries
 from src.schemas import users as user_schemas
+from src.schemas import recipes as recipe_schemas
 from src.api.exceptions import users as user_exceptions
 from src.api.endpoints.users import get_me
 from config.db import get_async_session
@@ -42,7 +44,7 @@ async def get_my_subscriptions(
     )
     if subscriptions is None:
         raise user_exceptions.SomethingGoesWrong
-    subscriptions_schemas_list = []
+    subscriptions_schemas_list: list[user_schemas.GetSubscriptions] = []
     for follower in subscriptions:
         sub_schema = user_schemas.GetSubscriptions.model_validate(follower)
         sub_schema.recipes = (
@@ -67,7 +69,7 @@ async def get_my_subscriptions(
     )
     return SubscibePagination(
         count=count,
-        result=subscriptions_schemas_list,
+        results=subscriptions_schemas_list,
         **links
     )
 
@@ -75,21 +77,43 @@ async def get_my_subscriptions(
 @router.post(
     "/{user_id}/subscribe/",
     status_code=status.HTTP_201_CREATED,
-    response_model=user_schemas.GetSubscriptions
 )
 async def subscribe(
     user_id: int,
+    recipes_limit: int = Query(None),
     current_user: User = Depends(get_me),
     session: AsyncSession = Depends(get_async_session)
 ) -> Any:
-    subsribe = await subscribe_queries.subsribe(
+    subscriber = await subscribe_queries.subsribe(
         current_user_id=current_user.id,
         user_id=user_id,
         session=session
     )
-    if subsribe is None:
+    if subscriber is None:
         raise user_exceptions.SomethingGoesWrong
-    return subsribe
+    subscriber_recipes: list[Recipe] = (
+        await subscribe_queries.get_subscribe_users_recipes(
+            user_id=subscriber.id,
+            recipes_limit=recipes_limit,
+            session=session,
+        )
+    )
+    subscriber_recipes_count = (
+        await subscribe_queries.get_subscribe_users_recipes_count(
+            user_id=user_id,
+            session=session,
+        )
+    )
+    recipe_schema = [
+        recipe_schemas.Subcriptions.model_validate(recipe)
+        for recipe in subscriber_recipes
+    ]
+    response_schema = user_schemas.GetSubscriptions.model_validate(
+        subscriber
+    )
+    response_schema.recipes = recipe_schema
+    response_schema.recipes_count = subscriber_recipes_count
+    return response_schema
 
 
 @router.delete(

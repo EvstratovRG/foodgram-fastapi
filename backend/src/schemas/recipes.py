@@ -1,4 +1,4 @@
-from pydantic import BaseModel, StringConstraints, Field
+from pydantic import BaseModel, ConfigDict, StringConstraints, Field
 from typing import Annotated, Self
 from fastapi import Request
 from src.schemas.users import UserBaseSchema
@@ -95,10 +95,14 @@ class UpdateRecipeSchema(CreateRecipeSchema):
 class FavoriteRecipeSchema(BaseModel):
     id: int
     name: str
-    image: str
+    image: str | None = None
     cooking_time: int
 
+    model_config = ConfigDict(from_attributes=True)
+
     def image_convert(self: Self, request: Request) -> str:
+        if self.image is None:
+            return None
         if str(request.base_url) in self.image:
             return
         self.image = str(request.base_url) + 'media/' + self.image
