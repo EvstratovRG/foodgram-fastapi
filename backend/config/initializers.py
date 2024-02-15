@@ -14,13 +14,6 @@ def init_app() -> FastAPI:
         openapi_url="/api/openapi.json",
         redoc_url=None
     )
-    # if app.debug:
-    #     app.mount(
-    #         path="/static",
-    #         app=StaticFiles(directory="backend/static/"),
-    #         name="static"
-    #     )
-    #     return app
     # путь для локальной разработки
     # app.mount(
     #     path="/static",
