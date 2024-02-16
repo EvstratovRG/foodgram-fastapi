@@ -15,6 +15,7 @@ from config import app_config
 from typing import Any
 from src.api.dependencies.auth import get_current_user
 from src.models.users import User
+from src.api.constants.summaries import auth as auth_summaries
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,13 +25,13 @@ router = APIRouter(prefix="/auth/token", tags=["/auth/token"])
 @router.post(
     "/login/",
     response_model=base_schemas.Token,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    summary=auth_summaries.getting_jwt_token,
 )
 async def login_to_get_token(
     schema: base_schemas.AuthLoginSchema,
     session: AsyncSession = Depends(get_async_session)
 ) -> Any:
-    """Получить токен авторизации."""
     user = await authenticate_user(
         email=schema.email,
         password=schema.password,
@@ -54,13 +55,13 @@ async def login_to_get_token(
 
 @router.post(
     "/logout/",
-    response_model=base_schemas.StatusSchema
+    response_model=base_schemas.StatusSchema,
+    summary=auth_summaries.del_jwt_token
 )
 async def delete_users_token(
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session)
 ) -> Any:
-    """Удалить токен авторизации."""
     deleted_token = await delete_token_from_user_instance(
         user=user,
         session=session,

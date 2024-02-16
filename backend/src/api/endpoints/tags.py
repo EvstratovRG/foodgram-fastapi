@@ -4,6 +4,7 @@ from typing import Any
 from src.queries import tags as tag_queries
 from src.schemas import recipes as tag_schemas
 from config.db import get_async_session
+from src.api.constants.summaries import tags as tag_summaries
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,7 +14,8 @@ router = APIRouter(prefix="/tags", tags=["/tags"])
 @router.get(
     "/",
     status_code=status.HTTP_200_OK,
-    response_model=list[tag_schemas.BaseTagSchema]
+    response_model=list[tag_schemas.BaseTagSchema],
+    summary=tag_summaries.get_the_list_of_tags
 )
 async def get_tags(
     session: AsyncSession = Depends(get_async_session)
@@ -24,26 +26,11 @@ async def get_tags(
     return tags
 
 
-@router.post(
-    "/",
-    status_code=status.HTTP_201_CREATED,
-    response_model=tag_schemas.BaseTagSchema
-)
-async def post_tag(
-    schema: tag_schemas.CreateTagSchema,
-    session: AsyncSession = Depends(get_async_session),
-) -> Any:
-    tag = await tag_queries.post_tag(
-        session=session,
-        tag_schema=schema
-    )
-    return tag
-
-
 @router.get(
     "/{tag_id}/",
     status_code=status.HTTP_200_OK,
-    response_model=tag_schemas.BaseTagSchema
+    response_model=tag_schemas.BaseTagSchema,
+    summary=tag_summaries.get_definite_tag
 )
 async def get_tag(
     tag_id: int,

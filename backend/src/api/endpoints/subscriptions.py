@@ -9,6 +9,7 @@ from src.schemas import users as user_schemas
 from src.schemas import recipes as recipe_schemas
 from src.api.exceptions import users as user_exceptions
 from src.api.endpoints.users import get_me
+from src.api.constants.summaries import subscriptions as subscription_summaries
 from config.db import get_async_session
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,7 +23,8 @@ SubscibePagination = (
 @router.get(
     "/subscriptions/",
     status_code=status.HTTP_200_OK,
-    response_model=SubscibePagination
+    response_model=SubscibePagination,
+    summary=subscription_summaries.get_current_user_subscriptions
 )
 async def get_my_subscriptions(
     request: Request,
@@ -77,6 +79,8 @@ async def get_my_subscriptions(
 @router.post(
     "/{user_id}/subscribe/",
     status_code=status.HTTP_201_CREATED,
+    response_model=user_schemas.GetSubscriptions,
+    summary=subscription_summaries.subscribe_definite_user
 )
 async def subscribe(
     user_id: int,
@@ -119,6 +123,7 @@ async def subscribe(
 @router.delete(
     "/{user_id}/subscribe/",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary=subscription_summaries.unsubscribe_user
 )
 async def unsubscribe(
     user_id: int,

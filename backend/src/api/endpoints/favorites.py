@@ -6,6 +6,7 @@ from src.schemas import recipes as recipe_schemas
 from src.api.exceptions import recipes as recipe_exceptions
 from src.api.endpoints.users import get_me
 from config.db import get_async_session
+from src.api.constants.summaries import favorites as favorite_summaries
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,6 +16,7 @@ router = APIRouter(prefix="/recipes", tags=["/recipes"])
 @router.post(
     "/{recipe_id}/favorite/",
     status_code=status.HTTP_201_CREATED,
+    summary=favorite_summaries.adding_recipe_to_favorites
 )
 async def favorite(
     request: Request,
@@ -42,6 +44,7 @@ async def favorite(
 @router.delete(
     "/{recipe_id}/favorite/",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary=favorite_summaries.delete_recipe_from_favorites
 )
 async def unfavorite(
     recipe_id: int,

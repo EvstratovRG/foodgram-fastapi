@@ -8,6 +8,7 @@ from src.api.exceptions import users as user_exceptions
 from src.api.exceptions import recipes as recipe_exceptions
 from src.api.endpoints.users import get_me
 from config.db import get_async_session
+from src.api.constants.summaries import carts as cart_summaries
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +18,8 @@ router = APIRouter(prefix="/recipes", tags=["/recipes"])
 @router.get(
     "/download_shopping_cart/",
     status_code=status.HTTP_200_OK,
-    response_class=FileResponse
+    response_class=FileResponse,
+    summary=cart_summaries.downloading_shopping_cart
 )
 async def download_shopping_cart(
     current_user: User = Depends(get_me),
@@ -47,7 +49,8 @@ async def download_shopping_cart(
 @router.post(
     "/{recipe_id}/shopping_cart/",
     status_code=status.HTTP_201_CREATED,
-    response_model=recipe_schemas.PurchaseCart
+    response_model=recipe_schemas.PurchaseCart,
+    summary=cart_summaries.adding_recipe_to_cart
 )
 async def add_to_shopping_cart(
     recipe_id: int,
@@ -67,6 +70,7 @@ async def add_to_shopping_cart(
 @router.delete(
     "/{recipe_id}/shopping_cart/",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary=cart_summaries.delete_recipe_from_the_cart
 )
 async def del_from_shopping_cart(
     recipe_id: int,
