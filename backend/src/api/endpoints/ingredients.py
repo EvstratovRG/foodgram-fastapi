@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, Query, status
 from typing import Any
 
-from src.queries import ingredients as ingredient_queries
-from src.schemas import recipes as ingredient_schemas
 from config.db import get_async_session
+from src.queries import ingredients as ingredient_queries
 from src.api.constants.summaries import ingredients as ingredient_summaries
-
+from src.api.constants.responses import ingredients as ingredient_responses
+from src.schemas import recipes as recipe_schemas
+from src.api.exceptions import recipes as recipe_exceptions
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -15,7 +16,7 @@ router = APIRouter(prefix="/ingredients", tags=["/ingredients"])
 @router.get(
     "/",
     status_code=status.HTTP_200_OK,
-    response_model=list[ingredient_schemas.BaseIngredientSchema],
+    responses=ingredient_responses.get_ingredients,
     summary=ingredient_summaries.get_list_of_ingredients
 )
 async def get_ingredients(
@@ -26,13 +27,16 @@ async def get_ingredients(
         session=session,
         name=name,
     )
-    return ingredients
+    return [
+        recipe_schemas.BaseIngredientSchema.model_validate(ingredient)
+        for ingredient in ingredients
+    ]
 
 
 @router.get(
     "/{ingredient_id}/",
     status_code=status.HTTP_200_OK,
-    response_model=ingredient_schemas.BaseIngredientSchema,
+    responses=ingredient_responses.get_ingredient,
     summary=ingredient_summaries.get_definite_ingredient
 )
 async def get_ingredient(
@@ -44,5 +48,5 @@ async def get_ingredient(
         session=session
     )
     if ingredient is None:
-        return status.HTTP_404_NOT_FOUND
-    return ingredient
+        raise recipe_exceptions.IngredientNotFound
+    return recipe_schemas.BaseIngredientSchema.model_validate(ingredient)

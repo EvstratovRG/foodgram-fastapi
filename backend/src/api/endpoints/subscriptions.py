@@ -91,7 +91,7 @@ async def subscribe(
         session=session
     )
     if subscriber is None:
-        raise user_exceptions.SomethingGoesWrong
+        raise user_exceptions.UserNotFound
     subscriber_recipes: list[Recipe] = (
         await subscribe_queries.get_subscribe_users_recipes(
             user_id=subscriber.id,
@@ -134,5 +134,5 @@ async def unsubscribe(
         session=session
     )
     if not subsribe:
-        raise user_exceptions.UserNotFoundException
+        raise user_exceptions.UserNotFound
     return None

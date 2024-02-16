@@ -10,7 +10,7 @@ from src.auth.authorization import (
 )
 from src.schemas import base as base_schemas
 from config.db import get_async_session
-from src.api.exceptions.users import SomethingGoesWrong, WrongСredentials
+from src.api.exceptions import users as user_exceptions
 from config import app_config
 from typing import Any
 from src.api.dependencies.auth import get_current_user
@@ -38,7 +38,7 @@ async def login_to_get_token(
         session=session
     )
     if not user:
-        raise WrongСredentials
+        raise user_exceptions.WrongСredentials
     token = create_token(
         data={'sub': user.email},
         expires_delta=timedelta(minutes=app_config.token_expire),
@@ -49,8 +49,8 @@ async def login_to_get_token(
         session=session,
     )
     if not added_token:
-        raise SomethingGoesWrong
-    return {'auth_token': token}
+        raise user_exceptions.WrongСredentials
+    return base_schemas.Token.model_validate_json(token)
 
 
 @router.post(
@@ -69,5 +69,5 @@ async def delete_users_token(
         session=session,
     )
     if not deleted_token:
-        raise SomethingGoesWrong
+        raise user_exceptions.WrongСredentials
     return

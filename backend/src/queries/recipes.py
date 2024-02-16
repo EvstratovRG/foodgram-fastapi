@@ -294,18 +294,11 @@ async def update_recipe(
         session
     )
     await session.commit()
-    return recipes_schema.RecipeBaseSchema(
-        id=recipe_id,
-        name=recipe.name,
-        text=recipe.text,
-        cooking_time=recipe.cooking_time,
-        image=recipe.image,
-        author=author,
-        tags=recipe_tags,
-        ingredients=recipe_ingredients,
-        is_favorited=recipe.is_favorited,
-        is_in_shopping_cart=recipe.is_in_shopping_cart
-    )
+    recipe_schema = recipes_schema.RecipeBaseSchema.model_validate(recipe)
+    recipe_schema.tags = recipe_tags
+    recipe_schema.ingredients = recipe_ingredients
+    recipe_schema.author = author
+    return recipe_schema
 
 
 async def delete_recipe(

@@ -6,11 +6,7 @@ from src.models.users import User
 from src.queries import recipes as recipe_queries
 from src.schemas import recipes as recipe_schemas
 from src.pagination import schemas as pagination_schemas
-from src.schemas import base as base_schemas
-from src.api.exceptions.recipes import (
-    RecipeNotFoundException,
-    SomethingGoesWrong
-)
+from src.api.exceptions import recipes as recipe_exceptions
 from config.db import get_async_session
 from src.api.constants.summaries import recipes as recipes_summaries
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -52,7 +48,7 @@ async def get_recipes(
         session=session
     )
     if recipes is None:
-        raise SomethingGoesWrong
+        raise recipe_exceptions.BadRequest
     recipe_schemas_list = []
     for r in recipes:
         r_schema = recipe_schemas.RecipeBaseSchema.model_validate(r)
@@ -109,7 +105,7 @@ async def get_recipe(
         session=session
     )
     if recipe is None:
-        raise RecipeNotFoundException
+        raise recipe_exceptions.RecipeNotFound
     r_schema = recipe_schemas.RecipeBaseSchema.model_validate(recipe)
     r_schema.image_convert(request)
     return r_schema
@@ -134,24 +130,23 @@ async def update_recipe(
         recipe_schema=recipe_schema
     )
     if not updated_recipe:
-        return status.HTTP_404_NOT_FOUND
+        raise recipe_exceptions.BadRequestUpdate
     return updated_recipe
 
 
 @router.delete(
     "/{recipe_id}/",
-    status_code=status.HTTP_202_ACCEPTED,
-    response_model=base_schemas.StatusSchema,
+    status_code=status.HTTP_204_NO_CONTENT,
     summary=recipes_summaries.delete_definite_recipe
 )
 async def delete_recipe(
     recipe_id: int,
     session: AsyncSession = Depends(get_async_session),
-) -> Any:
+):
     deleted_recipe = await recipe_queries.delete_recipe(
         session=session,
         recipe_id=recipe_id
     )
     if not deleted_recipe:
-        return status.HTTP_404_NOT_FOUND
-    return deleted_recipe
+        raise recipe_exceptions.RecipeNotFound
+    return

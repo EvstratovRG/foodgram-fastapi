@@ -70,8 +70,8 @@ async def create_user(
         user_schema=user_schema
     )
     if created_user is None:
-        raise user_exceptions.AlreadyExistsException
-    return created_user
+        raise user_exceptions.AlreadyExists
+    return user_schemas.UserBaseSchema.model_validate(create_user)
 
 
 @router.get(
@@ -84,7 +84,7 @@ async def get_me(
     user: User = Depends(get_current_user),
 ) -> Any:
     """Получить текущего пользователя."""
-    return user
+    return user_schemas.UserBaseSchema.model_validate(user)
 
 
 @router.post(
@@ -114,7 +114,7 @@ async def change_users_password(
         )
     )
     if not changed_password:
-        return status.HTTP_400_BAD_REQUEST
+        raise user_exceptions.ChangePassword
     return
 
 
@@ -134,5 +134,5 @@ async def get_user(
         session=session
     )
     if user is None:
-        raise user_exceptions.UserNotFoundException
-    return user
+        raise user_exceptions.UserNotFound
+    return user_schemas.UserBaseSchema.model_validate(user)

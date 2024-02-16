@@ -2,19 +2,27 @@ from fastapi.exceptions import HTTPException
 from fastapi import status
 
 
-RecipeNotFoundException = HTTPException(
+RecipeNotFound = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
     detail='Рецепт с таким id - не найден.'
 )
-ImageLoadException = HTTPException(
+ImageLoad = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
     detail='Загрузка изображения пошла не по плану.'
 )
-ThroughEntityException = HTTPException(
+ThroughEntity = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
     detail='Ошибка при создании many-to-many.'
 )
-SomethingGoesWrong = HTTPException(
+BadRequest = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
-    detail='Что то пошло не так'
+    detail='При загрузке рецептов произошла ошибка.'
+)
+IngredientNotFound = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail='Ингредиент с таким id - не найден.'
+)
+BadRequestUpdate = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST,
+    detail='При попытке обновить рецепт произошла ошибка.'
 )
