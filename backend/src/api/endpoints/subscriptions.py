@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, status, Query, Request
 from typing import Any
 from src.models.recipes import Recipe
 from src.pagination.links import LinkCreator
-from src.pagination import schemas as pagination_schema
 from src.models.users import User
 from src.queries import subscriptions as subscribe_queries
 from src.schemas import users as user_schemas
@@ -11,19 +10,17 @@ from src.api.exceptions import users as user_exceptions
 from src.api.endpoints.users import get_me
 from src.api.constants.summaries import subscriptions as subscription_summaries
 from config.db import get_async_session
-
+from src.pagination import schemas as pagination_schemas
+from src.api.constants.responses import subscriptions as subscription_responses
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/users", tags=["/users"])
-SubscibePagination = (
-    pagination_schema.Pagination[user_schemas.GetSubscriptions]
-)
 
 
 @router.get(
     "/subscriptions/",
     status_code=status.HTTP_200_OK,
-    response_model=SubscibePagination,
+    responses=subscription_responses.get_subscriptions,
     summary=subscription_summaries.get_current_user_subscriptions
 )
 async def get_my_subscriptions(
@@ -69,7 +66,7 @@ async def get_my_subscriptions(
         total=count,
         request=request
     )
-    return SubscibePagination(
+    return pagination_schemas.SubscibePagination(
         count=count,
         results=subscriptions_schemas_list,
         **links
@@ -79,7 +76,7 @@ async def get_my_subscriptions(
 @router.post(
     "/{user_id}/subscribe/",
     status_code=status.HTTP_201_CREATED,
-    response_model=user_schemas.GetSubscriptions,
+    responses=subscription_responses.create_subscribe,
     summary=subscription_summaries.subscribe_definite_user
 )
 async def subscribe(
@@ -123,7 +120,8 @@ async def subscribe(
 @router.delete(
     "/{user_id}/subscribe/",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary=subscription_summaries.unsubscribe_user
+    summary=subscription_summaries.unsubscribe_user,
+    responses=subscription_responses.delete_subscribe,
 )
 async def unsubscribe(
     user_id: int,

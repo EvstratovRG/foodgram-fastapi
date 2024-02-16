@@ -7,22 +7,20 @@ from src.queries import users as user_queries
 from src.schemas import users as user_schemas
 from src.pagination import schemas as pagination_schema
 from src.pagination.links import LinkCreator
-from src.schemas import base as base_schemas
 from src.hasher import Hasher
 from config.db import get_async_session
 from fastapi import Request
 from src.api.constants.summaries import users as user_summaries
-
+from src.api.constants.responses import users as user_responses
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/users", tags=["/users"])
-UserPagination = pagination_schema.Pagination[user_schemas.UserBaseSchema]
 
 
 @router.get(
     "/",
     status_code=status.HTTP_200_OK,
-    response_model=UserPagination,
+    responses=user_responses.get_users,
     summary=user_summaries.get_the_list_of_users
 )
 async def get_users(
@@ -48,9 +46,9 @@ async def get_users(
         total=count,
         request=request
     )
-    return UserPagination(
+    return pagination_schema.UserPagination(
         count=count,
-        result=users,
+        results=users,
         **links
     )
 
@@ -59,7 +57,7 @@ async def get_users(
     "/",
     status_code=status.HTTP_201_CREATED,
     description='Регистрация пользователя',
-    response_model=user_schemas.UserBaseSchema,
+    responses=user_responses.create_user,
     summary=user_summaries.create_user_form
 )
 async def create_user(
@@ -79,7 +77,7 @@ async def create_user(
 @router.get(
     "/me/",
     status_code=status.HTTP_200_OK,
-    response_model=user_schemas.UserBaseSchema,
+    responses=user_responses.get_me,
     summary=user_summaries.get_current_user
 )
 async def get_me(
@@ -91,15 +89,16 @@ async def get_me(
 
 @router.post(
     "/set_password/",
-    status_code=status.HTTP_200_OK,
-    response_model=base_schemas.UpdatePasswordResponseSchema,
-    summary=user_summaries.change_password_of_current_user
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary=user_summaries.change_password_of_current_user,
+    response_description='Пароль успешно изменен.',
+    responses=user_responses.set_password
 )
 async def change_users_password(
     user_schema: user_schemas.ChangeUserPassword,
     current_user: User = Depends(get_me),
     session: AsyncSession = Depends(get_async_session),
-) -> Any:
+):
     """Изменить пароль текущего пользователя."""
     validate_current_password = Hasher.verify_password(
         user_schema.current_password,
@@ -116,16 +115,13 @@ async def change_users_password(
     )
     if not changed_password:
         return status.HTTP_400_BAD_REQUEST
-    return base_schemas.UpdatePasswordResponseSchema(
-        status_code=status.HTTP_204_NO_CONTENT,
-        detail='Пароль успешно изменен.'
-    )
+    return
 
 
 @router.get(
     "/{user_id}/",
     status_code=status.HTTP_200_OK,
-    response_model=user_schemas.UserBaseSchema,
+    responses=user_responses.get_user,
     summary=user_summaries.get_user_by_id,
 )
 async def get_user(

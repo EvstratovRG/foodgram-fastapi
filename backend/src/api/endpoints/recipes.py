@@ -5,7 +5,7 @@ from src.api.endpoints.users import get_me
 from src.models.users import User
 from src.queries import recipes as recipe_queries
 from src.schemas import recipes as recipe_schemas
-from src.pagination import schemas as pagination_schema
+from src.pagination import schemas as pagination_schemas
 from src.schemas import base as base_schemas
 from src.api.exceptions.recipes import (
     RecipeNotFoundException,
@@ -13,19 +13,15 @@ from src.api.exceptions.recipes import (
 )
 from config.db import get_async_session
 from src.api.constants.summaries import recipes as recipes_summaries
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/recipes", tags=["/recipes"])
-RecipePagination = pagination_schema.Pagination[
-    recipe_schemas.RecipeBaseSchema
-]
 
 
 @router.get(
     "/",
     status_code=status.HTTP_200_OK,
-    response_model=RecipePagination,
+    response_model=pagination_schemas.RecipePagination,
     summary=recipes_summaries.get_paginated_list_of_recipes
 )
 async def get_recipes(
@@ -69,7 +65,7 @@ async def get_recipes(
         total=count,
         request=request
     )
-    return RecipePagination(
+    return pagination_schemas.RecipePagination(
         count=count,
         results=recipe_schemas_list,
         **links

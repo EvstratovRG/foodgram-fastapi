@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Generic, TypeVar
+from src.schemas import users as user_schemas
+from src.schemas import recipes as recipe_schemas
 
 
 T = TypeVar('T')
@@ -10,3 +12,8 @@ class Pagination(BaseModel, Generic[T]):
     next: str | None
     previous: str | None = None
     results: list[T] = Field([])
+
+
+UserPagination = Pagination[user_schemas.UserBaseSchema]
+SubscibePagination = Pagination[user_schemas.GetSubscriptions]
+RecipePagination = Pagination[recipe_schemas.RecipeBaseSchema]
