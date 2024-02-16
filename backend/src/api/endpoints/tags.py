@@ -14,7 +14,8 @@ router = APIRouter(prefix="/tags", tags=["/tags"])
     "/",
     status_code=status.HTTP_200_OK,
     responses=tag_responses.get_tags,
-    summary=tag_summaries.get_the_list_of_tags
+    summary=tag_summaries.get_the_list_of_tags,
+    response_model=list[recipe_schemas.BaseTagSchema]
 )
 async def get_tags(
     session: AsyncSession = Depends(get_async_session)
@@ -22,14 +23,15 @@ async def get_tags(
     tags = await tag_queries.get_tags(
         session=session
     )
-    return [recipe_schemas.BaseTagSchema.model_validate(tag) for tag in tags]
+    return tags
 
 
 @router.get(
     "/{tag_id}/",
     status_code=status.HTTP_200_OK,
     responses=tag_responses.get_tag,
-    summary=tag_summaries.get_definite_tag
+    summary=tag_summaries.get_definite_tag,
+    response_model=recipe_schemas.BaseTagSchema
 )
 async def get_tag(
     tag_id: int,
@@ -41,4 +43,4 @@ async def get_tag(
     )
     if tag is None:
         return status.HTTP_404_NOT_FOUND
-    return recipe_schemas.BaseTagSchema.model_validate(tag)
+    return tag

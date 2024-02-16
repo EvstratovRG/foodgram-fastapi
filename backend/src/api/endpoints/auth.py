@@ -27,6 +27,7 @@ router = APIRouter(prefix="/auth/token", tags=["/auth/token"])
     status_code=status.HTTP_201_CREATED,
     summary=auth_summaries.getting_jwt_token,
     responses=auth_responses.post_token,
+    response_model=base_schemas.Token
 )
 async def login_to_get_token(
     schema: base_schemas.AuthLoginSchema,
@@ -50,7 +51,7 @@ async def login_to_get_token(
     )
     if not added_token:
         raise user_exceptions.WrongСredentials
-    return base_schemas.Token.model_validate_json(token)
+    return {'auth_token': token}
 
 
 @router.post(

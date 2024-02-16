@@ -21,7 +21,8 @@ router = APIRouter(prefix="/users", tags=["/users"])
     "/subscriptions/",
     status_code=status.HTTP_200_OK,
     responses=subscription_responses.get_subscriptions,
-    summary=subscription_summaries.get_current_user_subscriptions
+    summary=subscription_summaries.get_current_user_subscriptions,
+    response_model=pagination_schemas.SubscibePagination
 )
 async def get_my_subscriptions(
     request: Request,
@@ -77,7 +78,8 @@ async def get_my_subscriptions(
     "/{user_id}/subscribe/",
     status_code=status.HTTP_201_CREATED,
     responses=subscription_responses.create_subscribe,
-    summary=subscription_summaries.subscribe_definite_user
+    summary=subscription_summaries.subscribe_definite_user,
+    response_model=user_schemas.GetSubscriptions
 )
 async def subscribe(
     user_id: int,

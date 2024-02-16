@@ -10,6 +10,7 @@ from src.api.exceptions import recipes as recipe_exceptions
 from config.db import get_async_session
 from src.api.constants.summaries import recipes as recipes_summaries
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.api.constants.responses import recipes as recipe_responses
 
 router = APIRouter(prefix="/recipes", tags=["/recipes"])
 
@@ -17,6 +18,7 @@ router = APIRouter(prefix="/recipes", tags=["/recipes"])
 @router.get(
     "/",
     status_code=status.HTTP_200_OK,
+    responses=recipe_responses.get_recipes,
     response_model=pagination_schemas.RecipePagination,
     summary=recipes_summaries.get_paginated_list_of_recipes
 )
@@ -71,6 +73,7 @@ async def get_recipes(
 @router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
+    responses=recipe_responses.create_recipe,
     response_model=recipe_schemas.RecipeBaseSchema,
     summary=recipes_summaries.create_recipe
 )
@@ -92,6 +95,7 @@ async def create_recipe(
 @router.get(
     "/{recipe_id}/",
     status_code=status.HTTP_200_OK,
+    responses=recipe_responses.get_recipe,
     response_model=recipe_schemas.RecipeBaseSchema,
     summary=recipes_summaries.get_definite_recipe
 )
@@ -114,6 +118,7 @@ async def get_recipe(
 @router.patch(
     "/{recipe_id}/",
     status_code=status.HTTP_200_OK,
+    responses=recipe_responses.update_recipe,
     response_model=recipe_schemas.RecipeBaseSchema,
     summary=recipes_summaries.update_definite_recipe
 )
@@ -137,6 +142,7 @@ async def update_recipe(
 @router.delete(
     "/{recipe_id}/",
     status_code=status.HTTP_204_NO_CONTENT,
+    responses=recipe_responses.delete_recipe,
     summary=recipes_summaries.delete_definite_recipe
 )
 async def delete_recipe(

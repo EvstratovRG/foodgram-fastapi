@@ -17,7 +17,8 @@ router = APIRouter(prefix="/ingredients", tags=["/ingredients"])
     "/",
     status_code=status.HTTP_200_OK,
     responses=ingredient_responses.get_ingredients,
-    summary=ingredient_summaries.get_list_of_ingredients
+    summary=ingredient_summaries.get_list_of_ingredients,
+    response_model=list[recipe_schemas.BaseIngredientSchema]
 )
 async def get_ingredients(
     name: str | None = Query(None),
@@ -27,17 +28,15 @@ async def get_ingredients(
         session=session,
         name=name,
     )
-    return [
-        recipe_schemas.BaseIngredientSchema.model_validate(ingredient)
-        for ingredient in ingredients
-    ]
+    return ingredients
 
 
 @router.get(
     "/{ingredient_id}/",
     status_code=status.HTTP_200_OK,
     responses=ingredient_responses.get_ingredient,
-    summary=ingredient_summaries.get_definite_ingredient
+    summary=ingredient_summaries.get_definite_ingredient,
+    response_model=recipe_schemas.BaseIngredientSchema
 )
 async def get_ingredient(
     ingredient_id: int,
@@ -49,4 +48,4 @@ async def get_ingredient(
     )
     if ingredient is None:
         raise recipe_exceptions.IngredientNotFound
-    return recipe_schemas.BaseIngredientSchema.model_validate(ingredient)
+    return ingredient

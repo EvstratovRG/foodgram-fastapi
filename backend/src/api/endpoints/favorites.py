@@ -7,7 +7,7 @@ from src.api.exceptions import recipes as recipe_exceptions
 from src.api.endpoints.users import get_me
 from config.db import get_async_session
 from src.api.constants.summaries import favorites as favorite_summaries
-
+from src.api.constants.responses import favorites as favorite_responses
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/recipes", tags=["/recipes"])
@@ -16,7 +16,9 @@ router = APIRouter(prefix="/recipes", tags=["/recipes"])
 @router.post(
     "/{recipe_id}/favorite/",
     status_code=status.HTTP_201_CREATED,
-    summary=favorite_summaries.adding_recipe_to_favorites
+    responses=favorite_responses.create_favorite_recipe,
+    summary=favorite_summaries.adding_recipe_to_favorites,
+    response_model=recipe_schemas.FavoriteRecipeSchema
 )
 async def favorite(
     request: Request,
@@ -30,20 +32,16 @@ async def favorite(
         session=session
     )
     if favorite is None:
-        raise recipe_exceptions.RecipeNotFoundException
+        raise recipe_exceptions.RecipeNotFound
     r_schema = recipe_schemas.RecipeBaseSchema.model_validate(favorite)
     r_schema.image_convert(request)
-    return recipe_schemas.FavoriteRecipeSchema(
-        id=r_schema.id,
-        name=r_schema.name,
-        image=r_schema.image,
-        cooking_time=r_schema.cooking_time
-    )
+    return r_schema
 
 
 @router.delete(
     "/{recipe_id}/favorite/",
     status_code=status.HTTP_204_NO_CONTENT,
+    responses=favorite_responses.delete_favorite_recipe,
     summary=favorite_summaries.delete_recipe_from_favorites
 )
 async def unfavorite(
@@ -57,5 +55,5 @@ async def unfavorite(
         session=session
     )
     if not unfavor:
-        raise recipe_exceptions.RecipeNotFoundException
+        raise recipe_exceptions.RecipeNotFound
     return None

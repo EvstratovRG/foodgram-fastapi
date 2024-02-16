@@ -21,7 +21,8 @@ router = APIRouter(prefix="/users", tags=["/users"])
     "/",
     status_code=status.HTTP_200_OK,
     responses=user_responses.get_users,
-    summary=user_summaries.get_the_list_of_users
+    summary=user_summaries.get_the_list_of_users,
+    response_model=pagination_schema.UserPagination,
 )
 async def get_users(
     request: Request,
@@ -58,7 +59,8 @@ async def get_users(
     status_code=status.HTTP_201_CREATED,
     description='Регистрация пользователя',
     responses=user_responses.create_user,
-    summary=user_summaries.create_user_form
+    summary=user_summaries.create_user_form,
+    response_model=user_schemas.UserBaseSchema,
 )
 async def create_user(
     user_schema: user_schemas.CreateUserSchema,
@@ -71,20 +73,21 @@ async def create_user(
     )
     if created_user is None:
         raise user_exceptions.AlreadyExists
-    return user_schemas.UserBaseSchema.model_validate(create_user)
+    return create_user
 
 
 @router.get(
     "/me/",
     status_code=status.HTTP_200_OK,
     responses=user_responses.get_me,
-    summary=user_summaries.get_current_user
+    summary=user_summaries.get_current_user,
+    response_model=user_schemas.UserBaseSchema,
 )
 async def get_me(
     user: User = Depends(get_current_user),
 ) -> Any:
     """Получить текущего пользователя."""
-    return user_schemas.UserBaseSchema.model_validate(user)
+    return user
 
 
 @router.post(
@@ -92,7 +95,7 @@ async def get_me(
     status_code=status.HTTP_204_NO_CONTENT,
     summary=user_summaries.change_password_of_current_user,
     response_description='Пароль успешно изменен.',
-    responses=user_responses.set_password
+    responses=user_responses.set_password,
 )
 async def change_users_password(
     user_schema: user_schemas.ChangeUserPassword,
@@ -123,6 +126,7 @@ async def change_users_password(
     status_code=status.HTTP_200_OK,
     responses=user_responses.get_user,
     summary=user_summaries.get_user_by_id,
+    response_model=user_schemas.UserBaseSchema
 )
 async def get_user(
     user_id: int,
@@ -135,4 +139,4 @@ async def get_user(
     )
     if user is None:
         raise user_exceptions.UserNotFound
-    return user_schemas.UserBaseSchema.model_validate(user)
+    return user
