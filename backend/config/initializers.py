@@ -2,30 +2,31 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from sqladmin import Admin
 
+from config.redis import init_redis_lifespan
+
 
 def init_app() -> FastAPI:
     from config import get_app_config
 
     app_config = get_app_config()
-
     app = FastAPI(
         **app_config.model_dump(),
         docs_url='/api/fastapi-docs/',
         openapi_url="/api/openapi.json",
-        redoc_url=None
+        redoc_url=None,
+        lifespan=init_redis_lifespan,
     )
-    # путь для локальной разработки
-    app.mount(
-        path="/static",
-        app=StaticFiles(directory="backend/static/"),
-        name="static"
-    )
+    # путь для дебагинга
     # app.mount(
     #     path="/static",
-    #     app=StaticFiles(directory="static/"),
+    #     app=StaticFiles(directory="backend/static/"),
     #     name="static"
     # )
-
+    app.mount(
+        path="/static",
+        app=StaticFiles(directory="static/"),
+        name="static"
+    )
     return app
 
 
