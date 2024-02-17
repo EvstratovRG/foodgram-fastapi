@@ -62,3 +62,21 @@ patch_recipe_by_id_200_example = {
     "email": "user1@yandex.ru",
     "is_subscribed": True
 }
+
+create_recipe_example = {
+        "json_schema_extra": {"examples": [{
+            "name": "Харчо",
+            "text": "Варим, пока не сварим!",
+            "cooking_time": 60,
+            "image": "data:image/jpeg;base64,/9j/4AAQSlZ...",
+            "tags": [
+                49
+            ],
+            "ingredients": [
+                {
+                    "id": 1,
+                    "amount": 5
+                }
+            ]
+            }]}
+        }

@@ -3,7 +3,6 @@ from src.api.constants.examples import recipes as recipe_examples
 from src.pagination import schemas as pagination_schemas
 from src.schemas import recipes as recipe_schemas
 
-
 get_recipes_200 = {
     200: {
         "model": pagination_schemas.RecipePagination,

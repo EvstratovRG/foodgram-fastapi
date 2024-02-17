@@ -1,14 +1,16 @@
-from fastapi import APIRouter, Depends, status, Request
 from typing import Any
+
+from fastapi import APIRouter, Depends, Request, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from config.db import get_async_session
+from src.api.constants.responses import favorites as favorite_responses
+from src.api.constants.summaries import favorites as favorite_summaries
+from src.api.endpoints.users import get_me
+from src.api.exceptions import recipes as recipe_exceptions
 from src.models.users import User
 from src.queries import favorites as favorite_queries
 from src.schemas import recipes as recipe_schemas
-from src.api.exceptions import recipes as recipe_exceptions
-from src.api.endpoints.users import get_me
-from config.db import get_async_session
-from src.api.constants.summaries import favorites as favorite_summaries
-from src.api.constants.responses import favorites as favorite_responses
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/recipes", tags=["/recipes"])
 

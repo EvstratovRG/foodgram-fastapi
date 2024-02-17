@@ -1,17 +1,14 @@
-from sqlalchemy import select, insert, func
 from typing import TYPE_CHECKING, Any
-from sqlalchemy.exc import IntegrityError
-from fastapi.exceptions import HTTPException
+
 from fastapi import status
-from src.queries import recipes as recipe_queries
+from fastapi.exceptions import HTTPException
+from sqlalchemy import func, insert, select
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+
+from src.models.recipes import (Ingredient, PurchaseCart, Recipe,
+                                RecipeIngredient)
 from src.models.users import User
-from src.models.recipes import (
-    Ingredient,
-    PurchaseCart,
-    RecipeIngredient,
-    Recipe,
-)
-from sqlalchemy.exc import SQLAlchemyError
+from src.queries import recipes as recipe_queries
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession

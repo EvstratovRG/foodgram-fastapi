@@ -1,4 +1,5 @@
-from typing import Optional, Mapping, Any
+from typing import Any, Mapping, Optional
+
 from fastapi import Request
 
 

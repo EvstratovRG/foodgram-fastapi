@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Depends, Query, status
 from typing import Any
 
-from config.db import get_async_session
-from src.queries import ingredients as ingredient_queries
-from src.api.constants.summaries import ingredients as ingredient_summaries
-from src.api.constants.responses import ingredients as ingredient_responses
-from src.schemas import recipes as recipe_schemas
-from src.api.exceptions import recipes as recipe_exceptions
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config.db import get_async_session
+from src.api.constants.responses import ingredients as ingredient_responses
+from src.api.constants.summaries import ingredients as ingredient_summaries
+from src.api.exceptions import recipes as recipe_exceptions
+from src.queries import ingredients as ingredient_queries
+from src.schemas import recipes as recipe_schemas
 
 router = APIRouter(prefix="/ingredients", tags=["/ingredients"])
 

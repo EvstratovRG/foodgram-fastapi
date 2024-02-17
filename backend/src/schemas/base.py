@@ -1,5 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
+from src.api.constants.examples import auth as auth_examples
+
 
 class BaseORMSchema(BaseModel):
     id: int
@@ -27,6 +29,8 @@ class Token(BaseModel):
 class AuthLoginSchema(BaseModel):
     email: str
     password: str
+
+    model_config = auth_examples.post_roken_auth_example
 
 
 class UpdatePasswordResponseSchema(ExceptionSchema):

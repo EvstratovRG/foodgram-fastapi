@@ -1,8 +1,9 @@
-from pydantic import BaseModel, Field
 from typing import Generic, TypeVar
-from src.schemas import users as user_schemas
-from src.schemas import recipes as recipe_schemas
 
+from pydantic import BaseModel, Field
+
+from src.schemas import recipes as recipe_schemas
+from src.schemas import users as user_schemas
 
 T = TypeVar('T')
 

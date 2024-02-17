@@ -1,8 +1,11 @@
-from pydantic import BaseModel, ConfigDict, StringConstraints, Field
 from typing import Annotated, Self
+
 from fastapi import Request
-from src.schemas.users import UserBaseSchema
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+
 from src.schemas.base import BaseORMSchema
+from src.schemas.users import UserBaseSchema
+from src.api.constants.examples import recipes as recipe_examples
 
 str_200 = Annotated[str, StringConstraints(max_length=200)]
 str_50 = Annotated[str, StringConstraints(max_length=50)]
@@ -86,6 +89,8 @@ class CreateRecipeSchema(BaseModel):
     image_incoded_base64: str = Field(alias='image')
     tags: list[int]
     ingredients: list[IngredientAmount]
+
+    model_config = recipe_examples.create_recipe_example
 
 
 class UpdateRecipeSchema(CreateRecipeSchema):

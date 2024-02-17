@@ -1,7 +1,8 @@
 import base64
+from uuid import uuid4
+
 from config import media_root
 from src.api.exceptions import recipes as recipe_exceptions
-from uuid import uuid4
 
 
 def base64_decoder(data: str) -> str | None:

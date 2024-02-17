@@ -1,16 +1,11 @@
-from sqlalchemy import (
-    Integer,
-    String,
-    ForeignKey,
-    Text,
-    UniqueConstraint,
-)
-from sqlalchemy.orm import mapped_column, Mapped, relationship
-from src.models.base import Base, TimeMixin, str_200
-from typing import Annotated, TYPE_CHECKING, Self
-from sqlalchemy.orm import validates
+from typing import TYPE_CHECKING, Annotated, Self
+
+from sqlalchemy import ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
+
+from src.models.base import Base, TimeMixin, str_200
 
 if TYPE_CHECKING:
     from src.models.users import User

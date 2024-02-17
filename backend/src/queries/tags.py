@@ -1,8 +1,8 @@
-from src.models.recipes import Tag
+from typing import TYPE_CHECKING, Sequence
+
 from sqlalchemy import select
 
-
-from typing import TYPE_CHECKING, Sequence
+from src.models.recipes import Tag
 
 if TYPE_CHECKING:
     from config.db import AsyncSession

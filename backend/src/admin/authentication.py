@@ -1,15 +1,16 @@
+from datetime import timedelta
+from typing import Self
+
+from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
 from sqladmin.authentication import AuthenticationBackend
-from fastapi.requests import Request
-from config.db import AsyncSession
-from src.models.users import User
 from sqlalchemy import select
-from src.hasher import Hasher
-from typing import Self
-from src.auth.authorization import create_token
-from datetime import timedelta
+
 from config import app_config
-from src.auth.authorization import decode_admin_session_token
+from config.db import AsyncSession
+from src.auth.authorization import create_token, decode_admin_session_token
+from src.hasher import Hasher
+from src.models.users import User
 
 
 class AdminAuth(AuthenticationBackend):

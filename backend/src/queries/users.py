@@ -1,14 +1,14 @@
-from fastapi import HTTPException, status
-from src.schemas import users as users_schema
-from src.models.users import User
-from sqlalchemy import select, insert, func
-from sqlalchemy.orm import selectinload
-from sqlalchemy.exc import IntegrityError
-from src.hasher import Hasher
-from src.pagination.paginate import paginate
-
 from typing import TYPE_CHECKING, Sequence
 
+from fastapi import HTTPException, status
+from sqlalchemy import func, insert, select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import selectinload
+
+from src.hasher import Hasher
+from src.models.users import User
+from src.pagination.paginate import paginate
+from src.schemas import users as users_schema
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession

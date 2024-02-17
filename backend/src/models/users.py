@@ -1,10 +1,11 @@
-from sqlalchemy import Boolean, UniqueConstraint, String
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from typing import TYPE_CHECKING, Annotated, Self
+
+from sqlalchemy import Boolean, String, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
-from src.models.base import Base, TimeMixin
-from typing import Annotated, TYPE_CHECKING, Self
-from src.models.base import str_150
-from src.models.recipes import Follow, PurchaseCart, Favorite
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from src.models.base import Base, TimeMixin, str_150
+from src.models.recipes import Favorite, Follow, PurchaseCart
 
 if TYPE_CHECKING:
     from src.models.recipes import Recipe

@@ -3,11 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 def get_fastapi_app() -> FastAPI:
-    from config.initializers import (
-        init_app,
-        init_routers,
-        init_admin,
-    )
+    from config.initializers import init_admin, init_app, init_routers
 
     application: FastAPI = init_app()
     application.add_middleware(

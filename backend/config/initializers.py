@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from sqladmin import Admin
 from fastapi.staticfiles import StaticFiles
+from sqladmin import Admin
 
 
 def init_app() -> FastAPI:
@@ -37,18 +37,12 @@ def init_routers(application: FastAPI) -> None:
 
 
 def init_admin(application: FastAPI) -> None:
-    from config.db import sync_engine
     from config import site_config
-    from src.admin.models import (
-        UserAdmin,
-        RecipeAdmin,
-        TagAdmin,
-        IngredientAdmin,
-        FollowAdmin,
-        FavoriteAdmin,
-        PurchaseCartAdmin,
-    )
+    from config.db import sync_engine
     from src.admin.authentication import AdminAuth
+    from src.admin.models import (FavoriteAdmin, FollowAdmin, IngredientAdmin,
+                                  PurchaseCartAdmin, RecipeAdmin, TagAdmin,
+                                  UserAdmin)
     authentication_backend = AdminAuth(secret_key=site_config.host)
     admin = Admin(
         application,

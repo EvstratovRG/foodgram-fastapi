@@ -1,7 +1,8 @@
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, EmailStr
 from typing import Annotated
-from src.schemas.base import BaseORMSchema
 
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
+
+from src.schemas.base import BaseORMSchema
 
 str_150 = Annotated[str, StringConstraints(max_length=150)]
 email_150 = Annotated[EmailStr, StringConstraints(max_length=150)]

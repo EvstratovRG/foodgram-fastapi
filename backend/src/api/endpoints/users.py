@@ -1,18 +1,19 @@
-from fastapi import APIRouter, Depends, status, Query
 from typing import Any
-from src.models.users import User
+
+from fastapi import APIRouter, Depends, Query, Request, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from config.db import get_async_session
+from src.api.constants.responses import users as user_responses
+from src.api.constants.summaries import users as user_summaries
 from src.api.dependencies.auth import get_current_user
 from src.api.exceptions import users as user_exceptions
-from src.queries import users as user_queries
-from src.schemas import users as user_schemas
+from src.hasher import Hasher
+from src.models.users import User
 from src.pagination import schemas as pagination_schema
 from src.pagination.links import LinkCreator
-from src.hasher import Hasher
-from config.db import get_async_session
-from fastapi import Request
-from src.api.constants.summaries import users as user_summaries
-from src.api.constants.responses import users as user_responses
-from sqlalchemy.ext.asyncio import AsyncSession
+from src.queries import users as user_queries
+from src.schemas import users as user_schemas
 
 router = APIRouter(prefix="/users", tags=["/users"])
 

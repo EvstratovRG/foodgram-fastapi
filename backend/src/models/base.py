@@ -1,13 +1,9 @@
 import datetime
+from typing import Annotated
 
 from sqlalchemy import DateTime, String, text
-from sqlalchemy.orm import (
-    DeclarativeBase,
-    mapped_column,
-    Mapped,
-    declared_attr
-)
-from typing import Annotated
+from sqlalchemy.orm import (DeclarativeBase, Mapped, declared_attr,
+                            mapped_column)
 
 str_150 = Annotated[str, 150]
 str_200 = Annotated[str, 200]

@@ -1,23 +1,18 @@
 import csv
 from typing import Self
+
 from fastapi import Request
 from fastapi.responses import RedirectResponse
 from sqladmin import ModelView, action
 from sqlalchemy import delete
-from src.models.users import User
-from src.models.recipes import (
-    Recipe,
-    Tag,
-    Ingredient,
-    Follow,
-    Favorite,
-    PurchaseCart
-)
-from config.db import AsyncSession
-from config import csv_data_root
 from sqlalchemy.dialects.postgresql import insert as upsert
-from src.hasher import Hasher
 
+from config import csv_data_root
+from config.db import AsyncSession
+from src.hasher import Hasher
+from src.models.recipes import (Favorite, Follow, Ingredient, PurchaseCart,
+                                Recipe, Tag)
+from src.models.users import User
 
 CSV_PATH_TAGS = csv_data_root + 'tags.csv'
 CSV_PATH_INGREDIENTS = csv_data_root + 'ingredients.csv'

@@ -2,7 +2,6 @@ from src.api.constants.descriptions import favorites as favorite_descriptions
 from src.api.constants.examples import favorites as favorite_examples
 from src.schemas import recipes as recipe_schemas
 
-
 create_favorite_recipe_201 = {
     201: {
         "model": recipe_schemas.FavoriteRecipeSchema,

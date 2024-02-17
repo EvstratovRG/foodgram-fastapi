@@ -2,7 +2,6 @@ from src.api.constants.descriptions import tags as tag_descriptions
 from src.api.constants.examples import tags as tag_examples
 from src.schemas import recipes as recipe_schemas
 
-
 get_tags_200 = {
     200: {
         "model": list[recipe_schemas.BaseTagSchema],

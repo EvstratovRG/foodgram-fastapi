@@ -1,18 +1,20 @@
-import sys
 import pathlib
+import sys
 from logging.config import fileConfig
+
+from alembic import context
 
 # from sqlalchemy import engine_from_config
 # from sqlalchemy import pool
 
-from alembic import context
 
 sys.path.insert(0, (pathlib.Path(__file__).parent.parent.parent).as_posix())
 sys.path.insert(1, (pathlib.Path(__file__).parent.parent / 'src').as_posix())
 
-from src.models import base
 from config import db_config
 from config.db import sync_engine
+from src.models import base
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

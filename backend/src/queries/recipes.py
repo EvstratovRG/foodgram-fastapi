@@ -1,24 +1,19 @@
-from src.models.users import User
-from src.schemas import recipes as recipes_schema
-from src.models.recipes import (
-    Recipe,
-    RecipeIngredient,
-    RecipeTag,
-    Tag,
-)
-from sqlalchemy import select, insert, func
+from typing import TYPE_CHECKING, Sequence
+
+from fastapi import status
+from fastapi.exceptions import HTTPException
+from sqlalchemy import func, insert, select
 from sqlalchemy.dialects.postgresql import insert as upsert
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import selectinload
+
+from src.api.base64_decoder import base64_decoder
+from src.models.recipes import Recipe, RecipeIngredient, RecipeTag, Tag
+from src.models.users import User
+from src.pagination.paginate import paginate
 from src.queries.ingredients import get_ingredient
 from src.queries.tags import get_tag
-from sqlalchemy.exc import IntegrityError
-from fastapi.exceptions import HTTPException
-from fastapi import status
-from sqlalchemy.exc import SQLAlchemyError
-from src.api.base64_decoder import base64_decoder
-from src.pagination.paginate import paginate
-
-from typing import TYPE_CHECKING, Sequence
+from src.schemas import recipes as recipes_schema
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession

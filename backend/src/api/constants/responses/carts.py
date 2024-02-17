@@ -2,7 +2,6 @@ from src.api.constants.descriptions import carts as cart_descriptions
 from src.api.constants.examples import carts as cart_examples
 from src.schemas import recipes as recipe_schemas
 
-
 add_recipe_to_shopping_cart_201 = {
     201: {
         "model": recipe_schemas.FavoriteRecipeSchema,

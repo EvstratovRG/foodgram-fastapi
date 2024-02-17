@@ -1,9 +1,7 @@
-from src.api.constants.descriptions import (
+from src.api.constants.descriptions import \
     ingredients as ingredient_descriptions
-)
 from src.api.constants.examples import ingredients as ingredient_examples
 from src.schemas import recipes as recipe_schemas
-
 
 get_ingredients_200 = {
     200: {

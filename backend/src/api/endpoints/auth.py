@@ -1,23 +1,21 @@
 from datetime import timedelta
-from fastapi import APIRouter, Depends, status
-from src.queries.users import (
-    add_token_to_user_instance,
-    delete_token_from_user_instance,
-)
-from src.auth.authorization import (
-    authenticate_user,
-    create_token,
-)
-from src.schemas import base as base_schemas
-from config.db import get_async_session
-from src.api.exceptions import users as user_exceptions
-from config import app_config
 from typing import Any
-from src.api.dependencies.auth import get_current_user
-from src.models.users import User
-from src.api.constants.summaries import auth as auth_summaries
-from src.api.constants.responses import auth as auth_responses
+
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from config import app_config
+from config.db import get_async_session
+from src.api.constants.descriptions import auth as auth_descriptions
+from src.api.constants.responses import auth as auth_responses
+from src.api.constants.summaries import auth as auth_summaries
+from src.api.dependencies.auth import get_current_user
+from src.api.exceptions import users as user_exceptions
+from src.auth.authorization import authenticate_user, create_token
+from src.models.users import User
+from src.queries.users import (add_token_to_user_instance,
+                               delete_token_from_user_instance)
+from src.schemas import base as base_schemas
 
 router = APIRouter(prefix="/auth/token", tags=["/auth/token"])
 
@@ -27,7 +25,8 @@ router = APIRouter(prefix="/auth/token", tags=["/auth/token"])
     status_code=status.HTTP_201_CREATED,
     summary=auth_summaries.getting_jwt_token,
     responses=auth_responses.post_token,
-    response_model=base_schemas.Token
+    response_model=base_schemas.Token,
+    description=auth_descriptions.login_description,
 )
 async def login_to_get_token(
     schema: base_schemas.AuthLoginSchema,
@@ -58,8 +57,9 @@ async def login_to_get_token(
     "/logout/",
     status_code=status.HTTP_204_NO_CONTENT,
     summary=auth_summaries.del_jwt_token,
-    response_description='Токен успешно удален.',
-    responses=auth_responses.delete_token
+    response_description=auth_descriptions.logout_response_description,
+    responses=auth_responses.delete_token,
+    description=auth_descriptions.logout_description,
 )
 async def delete_users_token(
     user: User = Depends(get_current_user),

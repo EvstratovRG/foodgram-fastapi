@@ -1,8 +1,8 @@
-from src.models.recipes import Ingredient
+from typing import TYPE_CHECKING, Sequence
+
 from sqlalchemy import select
 
-
-from typing import TYPE_CHECKING, Sequence
+from src.models.recipes import Ingredient
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession

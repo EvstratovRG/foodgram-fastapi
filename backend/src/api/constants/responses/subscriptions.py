@@ -1,10 +1,8 @@
-from src.api.constants.descriptions import (
+from src.api.constants.descriptions import \
     subscriptions as subscription_descriptions
-)
 from src.api.constants.examples import subscriptions as subscription_examples
 from src.pagination import schemas as pagination_schemas
 from src.schemas import users as user_schemas
-
 
 get_subscriptions_200 = {
     200: {

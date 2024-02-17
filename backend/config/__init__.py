@@ -1,7 +1,7 @@
 import pathlib
 from functools import lru_cache
 
-from config.settings import SiteSettings, ApplicationSettings, DatabaseSettings
+from config.settings import ApplicationSettings, DatabaseSettings, SiteSettings
 
 base_dir: str = pathlib.Path(__file__).parent.parent.as_posix()
 

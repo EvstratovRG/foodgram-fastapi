@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends, status
 from typing import Any
-from src.queries import tags as tag_queries
-from config.db import get_async_session
-from src.api.constants.summaries import tags as tag_summaries
-from src.api.constants.responses import tags as tag_responses
-from src.schemas import recipes as recipe_schemas
+
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from config.db import get_async_session
+from src.api.constants.responses import tags as tag_responses
+from src.api.constants.summaries import tags as tag_summaries
+from src.queries import tags as tag_queries
+from src.schemas import recipes as recipe_schemas
 
 router = APIRouter(prefix="/tags", tags=["/tags"])
 

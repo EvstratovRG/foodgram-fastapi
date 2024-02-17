@@ -1,17 +1,19 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import FileResponse
-from typing import Any
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from config.db import get_async_session
+from src.api.constants.descriptions import carts as cart_descriptions
+from src.api.constants.responses import carts as cart_responses
+from src.api.constants.summaries import carts as cart_summaries
+from src.api.endpoints.users import get_me
+from src.api.exceptions import recipes as recipe_exceptions
+from src.api.exceptions import users as user_exceptions
 from src.models.users import User
 from src.queries import carts as cart_queries
 from src.schemas import recipes as recipe_schemas
-from src.api.exceptions import users as user_exceptions
-from src.api.exceptions import recipes as recipe_exceptions
-from src.api.endpoints.users import get_me
-from config.db import get_async_session
-from src.api.constants.summaries import carts as cart_summaries
-from src.api.constants.responses import carts as cart_responses
-
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/recipes", tags=["/recipes"])
 
@@ -75,6 +77,7 @@ async def add_to_shopping_cart(
     status_code=status.HTTP_204_NO_CONTENT,
     summary=cart_summaries.delete_recipe_from_the_cart,
     responses=cart_responses.delete_recipe_from_shopping_cart,
+    response_description=cart_descriptions.delete_recipe_from_cart,
 )
 async def del_from_shopping_cart(
     recipe_id: int,

@@ -1,7 +1,6 @@
-from src.schemas import base as base_schemas
 from src.api.constants.descriptions import auth as auth_descriptions
 from src.api.constants.examples import auth as auth_examples
-
+from src.schemas import base as base_schemas
 
 post_token_201 = {
     201: {

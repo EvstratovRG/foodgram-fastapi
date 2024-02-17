@@ -1,12 +1,14 @@
-from fastapi import Request
-from src.queries import users as user_queries
-from src.hasher import Hasher
-from src.models.users import User
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
+
+from fastapi import Request
+from jose import JWTError, jwt
+
 from config import app_config
 from src.api.exceptions import users as user_exceptions
-from jose import jwt, JWTError
+from src.hasher import Hasher
+from src.models.users import User
+from src.queries import users as user_queries
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession

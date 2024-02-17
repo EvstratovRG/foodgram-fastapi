@@ -1,15 +1,16 @@
-from sqlalchemy import select, insert, func
-from sqlalchemy.orm import joinedload
-from typing import Sequence, TYPE_CHECKING
-from sqlalchemy.exc import IntegrityError
-from fastapi.exceptions import HTTPException
+from typing import TYPE_CHECKING, Sequence
+
 from fastapi import status
-from src.queries import users as user_queries
-from src.models.users import User
-from src.models.recipes import Follow, Recipe
-from sqlalchemy.exc import SQLAlchemyError
+from fastapi.exceptions import HTTPException
+from sqlalchemy import func, insert, select
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.orm import joinedload
+
 from src.api.exceptions import users as user_exceptions
+from src.models.recipes import Follow, Recipe
+from src.models.users import User
 from src.pagination.paginate import paginate
+from src.queries import users as user_queries
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
