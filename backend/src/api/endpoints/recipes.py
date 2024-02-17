@@ -1,9 +1,11 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config.db import get_async_session
+from src.api.constants import magic_numbers
 from src.api.constants.responses import recipes as recipe_responses
 from src.api.constants.summaries import recipes as recipes_summaries
 from src.api.endpoints.users import get_me
@@ -13,7 +15,6 @@ from src.pagination import schemas as pagination_schemas
 from src.pagination.links import LinkCreator
 from src.queries import recipes as recipe_queries
 from src.schemas import recipes as recipe_schemas
-
 router = APIRouter(prefix="/recipes", tags=["/recipes"])
 
 
@@ -24,6 +25,7 @@ router = APIRouter(prefix="/recipes", tags=["/recipes"])
     response_model=pagination_schemas.RecipePagination,
     summary=recipes_summaries.get_paginated_list_of_recipes
 )
+@cache(expire=magic_numbers.seconds_to_expire_cache)
 async def get_recipes(
     request: Request,
     page: int = Query(None),

@@ -2,10 +2,12 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi_cache.decorator import cache
 
 from config.db import get_async_session
 from src.api.constants.responses import ingredients as ingredient_responses
 from src.api.constants.summaries import ingredients as ingredient_summaries
+from src.api.constants import magic_numbers
 from src.api.exceptions import recipes as recipe_exceptions
 from src.queries import ingredients as ingredient_queries
 from src.schemas import recipes as recipe_schemas
@@ -20,6 +22,7 @@ router = APIRouter(prefix="/ingredients", tags=["/ingredients"])
     summary=ingredient_summaries.get_list_of_ingredients,
     response_model=list[recipe_schemas.BaseIngredientSchema]
 )
+@cache(expire=magic_numbers.seconds_to_expire_cache)
 async def get_ingredients(
     name: str | None = Query(None),
     session: AsyncSession = Depends(get_async_session)
